@@ -26,7 +26,7 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className=' min-h-screen space-y-6 mr-5 pb-10'>
+    <div className='min-h-screen space-y-6 mr-5 pb-10'>
       <div className="bg-[#FFA07A] text-white p-4 flex justify-between items-center rounded-3xl">
         <div className="flex items-center gap-2">
           <MdTipsAndUpdates className='text-primaryColor' size={40}/>
