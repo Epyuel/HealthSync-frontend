@@ -1,4 +1,4 @@
-import AdminDashboard from '@/pages/admin/AdminDashboard'
+import AdminDashboard from '@/appPages/admin/AdminDashboard'
 import React from 'react'
 
 const page = () => {

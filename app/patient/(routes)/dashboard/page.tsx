@@ -1,4 +1,4 @@
-import Dashboard from '@/pages/patient/Dashboard'
+import Dashboard from '@/appPages/patient/Dashboard'
 import Link from 'next/link'
 import React from 'react'
 import { IoChatbubbleSharp } from 'react-icons/io5'

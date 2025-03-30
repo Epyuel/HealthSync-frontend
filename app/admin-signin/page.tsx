@@ -1,4 +1,4 @@
-import AdminSignin from '@/pages/admin/AdminSignin'
+import AdminSignin from '@/appPages/admin/AdminSignin'
 import React from 'react'
 
 const page = () => {

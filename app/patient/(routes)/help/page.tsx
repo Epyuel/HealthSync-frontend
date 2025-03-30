@@ -1,4 +1,4 @@
-import Help from '@/pages/common/Help'
+import Help from '@/appPages/common/Help'
 import React from 'react'
 
 const page = () => {

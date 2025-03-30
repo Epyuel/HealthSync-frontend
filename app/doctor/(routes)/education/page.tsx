@@ -1,4 +1,4 @@
-import EducationCenter from '@/pages/doctor/EducationCenter'
+import EducationCenter from '@/appPages/doctor/EducationCenter'
 import React from 'react'
 
 const page = () => {

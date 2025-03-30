@@ -1,4 +1,4 @@
-import MedicalHistory from '@/pages/doctor/MedicalHistory'
+import MedicalHistory from '@/appPages/doctor/MedicalHistory'
 import React from 'react'
 
 const page = () => {

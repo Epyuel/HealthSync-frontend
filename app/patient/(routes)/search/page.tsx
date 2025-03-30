@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import DocSearch from "@/pages/common/DocSearch";
+import DocSearch from "@/appPages/common/DocSearch";
 import Back from "@/components/navigation/Back";
 
 const DocSearchWrapper = () => {

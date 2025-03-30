@@ -1,4 +1,4 @@
-import ChatPatient from '@/pages/patient/Chat'
+import ChatPatient from '@/appPages/patient/Chat'
 import React from 'react'
 
 const page = () => {
