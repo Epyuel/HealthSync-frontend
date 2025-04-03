@@ -236,7 +236,7 @@ export default function HospitalInformationPage({ setActiveHospitalTab }: Hospit
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Hospitals</h1>
-          <p className="text-muted-foreground mt-1">Manage all hospitals in the platform. Total: {totalCount}</p>
+          <p className="text-muted-foreground mt-1">Manage all hospitals in the platform. Total: <span className="text-secondaryColor font-bold">{totalCount}</span></p>
         </div>
         <Button onClick={() => setActiveHospitalTab("add")}>
           <Plus className="mr-2 h-4 w-4" />

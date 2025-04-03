@@ -1,14 +1,7 @@
-"use client";
+"use client"
 
-import React, { useState } from "react";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "@/components/ui/table";
+import { useState, useEffect } from "react"
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
 import {
   Pagination,
   PaginationContent,
@@ -16,87 +9,318 @@ import {
   PaginationLink,
   PaginationPrevious,
   PaginationNext,
-} from "@/components/ui/pagination";
-import { Input } from "@/components/ui/input";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+} from "@/components/ui/pagination"
+import { Input } from "@/components/ui/input"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog"
+import { Badge } from "@/components/ui/badge"
+import { format } from "date-fns"
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { FaStar, FaRegStar } from "react-icons/fa";
-import Link from "next/link";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
-// Dummy user data
-const usersData = [
-  { id: "00001", name: "Dr Biruk Girma", address: "089 Kutch Green Apt. 448", joined: "2019-09-04", role: "Doctor" },
-  { id: "00002", name: "Abeba Desalegn", address: "123 Main St", joined: "2020-01-12", role: "Patient" },
-  { id: "00003", name: "Dr John Doe", address: "456 Elm St", joined: "2021-03-23", role: "Doctor" },
-  { id: "00004", name: "Jane Smith", address: "789 Oak St", joined: "2022-02-15", role: "Patient" },
-  { id: "00005", name: "Dr Alice Johnson", address: "101 Pine St", joined: "2020-07-30", role: "Doctor" },
-  { id: "00006", name: "Bob Brown", address: "202 Maple St", joined: "2021-11-08", role: "Patient" },
-  { id: "00007", name: "Dr Charlie Black", address: "303 Cedar St", joined: "2024-05-19", role: "Doctor" },
-  { id: "00008", name: "Eve White", address: "404 Birch St", joined: "2022-08-27", role: "Patient" },
-];
+// Define the PatientResponse type
+interface PatientResponse {
+  bookmarks: any[]
+  banned: boolean
+  _id: string
+  firstname: string
+  lastname: string
+  email: string
+  age: number
+  height: number
+  weight: number
+  blood: string
+  gender: string
+  phoneNumber: string
+  medicalConditions: string[]
+  pastTreatments: string[]
+  majorAccidents: string[]
+  allergies: string[]
+  __v: number
+  createdAt: string
+  nationality?: string // Optional nationality field
+}
 
-// Function to filter users by joined
-const filterByDate = (joined: string, filter: string) => {
-  const userDate = new Date(joined);
-  const today = new Date();
+// Define the DoctorResponse type
+interface DoctorResponse {
+  bookmarks: any[]
+  status: string
+  banned: boolean
+  _id: string
+  firstname: string
+  lastname: string
+  email: string
+  age: number
+  gender: string
+  phoneNumber: string
+  specializations: string[]
+  qualifications: string[]
+  licenses: {
+    url: string
+    type: string
+    isVerified: boolean
+    _id: string
+  }[]
+  hospital: {
+    address: {
+      street: string
+      city: string
+      region: string
+      country: string
+      postalCode: string
+    }
+    _id: string
+    name: string
+    branch: number
+    __v: number
+  }
+  createdAt: string
+  updatedAt: string
+  __v: number
+}
+
+// Combined user type for merged data
+type User = (PatientResponse | DoctorResponse) & {
+  fullname: string
+  role?: string
+  banned?: boolean
+  createdAt?: string
+  email: string
+  phoneNumber: string
+  _id: string
+  status?: string
+  age: number
+  gender: string
+  specializations?: string[]
+  qualifications?: string[]
+  licenses?: {
+    url: string
+    type: string
+    isVerified: boolean
+    _id: string
+  }[]
+  hospital?: {
+    address: {
+      street: string
+      city: string
+      region: string
+      country: string
+      postalCode: string
+    }
+    _id: string
+    name: string
+    branch: number
+    __v: number
+  }
+  height?: number
+  weight?: number
+  blood?: string
+  medicalConditions?: string[]
+  pastTreatments?: string[]
+  majorAccidents?: string[]
+  allergies?: string[]
+  nationality?: string
+}
+
+// Sample data structure from backend
+const sampleData = {
+  patients: [
+    {
+      bookmarks: [],
+      banned: false,
+      _id: "67a0798ee48d2c496dffef6f",
+      firstname: "test",
+      lastname: "test",
+      email: "test@gmail.com",
+      age: 33,
+      height: 102,
+      weight: 35,
+      blood: "B+",
+      gender: "male",
+      phoneNumber: "251942512868",
+      medicalConditions: [],
+      pastTreatments: [],
+      majorAccidents: [],
+      allergies: [],
+      __v: 0,
+      createdAt: "2024-01-12T10:27:14.156Z",
+    }
+  ],
+  doctors: [
+    {
+      bookmarks: [],
+      status: "pending",
+      banned: false,
+      _id: "67eb15297db753f356e1173e",
+      firstname: "daniel",
+      lastname: "teka",
+      email: "dani@gmail.com",
+      age: 34,
+      gender: "male",
+      phoneNumber: "251987654321",
+      specializations: ["Orthopedics"],
+      qualifications: ["MCh"],
+      licenses: [
+        {
+          url: "https://res.cloudinary.com/drz9aa55k/image/upload/v1743459612/yzs7uqn5gmhxlldpaeje.pdf",
+          type: "pdf",
+          isVerified: false,
+          _id: "67eb15297db753f356e1173f",
+        },
+      ],
+      hospital: {
+        address: {
+          street: "Bethel PO BOX 127",
+          city: "Addis Ababa",
+          region: "Addis Ababa",
+          country: "Ethiopia",
+          postalCode: "35324",
+        },
+        _id: "67e83e268439394e7ff2ee53",
+        name: "Bethel General Hospital",
+        branch: 2,
+        __v: 0,
+      },
+      createdAt: "2025-03-31T22:20:25.702Z",
+      updatedAt: "2025-03-31T22:20:25.702Z",
+      __v: 0,
+    },
+  ],
+}
+
+const mergeUsersData = (patients: PatientResponse[], doctors: DoctorResponse[]): User[] => {
+  const patientsWithRole = patients.map((patient) => ({
+    ...patient,
+    role: "patient",
+    fullname: `${patient.firstname} ${patient.lastname}`,
+  }))
+
+  const doctorsWithRole = doctors.map((doctor) => ({
+    ...doctor,
+    role: "doctor",
+    fullname: `${doctor.firstname} ${doctor.lastname}`,
+  }))
+
+  return [...patientsWithRole, ...doctorsWithRole]
+}
+
+// Function to filter users by joined date
+const filterByDate = (joined: string | undefined, filter: string): boolean => {
+  if (!joined) return true
+
+  const userDate = new Date(joined)
+  const today = new Date()
 
   switch (filter) {
     case "week":
-      return userDate >= new Date(today.setDate(today.getDate() - 7));
+      const lastWeek = new Date()
+      lastWeek.setDate(today.getDate() - 7)
+      return userDate >= lastWeek
     case "month":
-      return userDate >= new Date(today.setMonth(today.getMonth() - 1));
+      const lastMonth = new Date()
+      lastMonth.setMonth(today.getMonth() - 1)
+      return userDate >= lastMonth
     case "4months":
-      return userDate >= new Date(today.setMonth(today.getMonth() - 4));
+      const last4Months = new Date()
+      last4Months.setMonth(today.getMonth() - 4)
+      return userDate >= last4Months
     case "year":
-      return userDate >= new Date(today.setFullYear(today.getFullYear() - 1));
+      const lastYear = new Date()
+      lastYear.setFullYear(today.getFullYear() - 1)
+      return userDate >= lastYear
     default:
-      return true;
+      return true
   }
-};
+}
 
 const UserManagement = () => {
-  const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
-  const [dateFilter, setDateFilter] = useState("all");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6; 
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [users, setUsers] = useState<User[]>([])
+  const [search, setSearch] = useState("")
+  const [roleFilter, setRoleFilter] = useState("all")
+  const [dateFilter, setDateFilter] = useState("all")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [pdfDialogOpen, setPdfDialogOpen] = useState(false)
+  const [selectedLicense, setSelectedLicense] = useState("")
+  const [banDialogOpen, setBanDialogOpen] = useState(false)
+  const itemsPerPage = 6
 
-  const filteredUsers = usersData.filter(user =>
-    (roleFilter !== "all" ? user.role === roleFilter : true) &&
-    (search ? user.name.toLowerCase().includes(search.toLowerCase()) : true) &&
-    filterByDate(user.joined, dateFilter)
-  );
+  useEffect(() => {
+    const mergedUsers = mergeUsersData(sampleData.patients, sampleData.doctors)
+    setUsers(mergedUsers)
+  }, [])
 
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-  const paginatedUsers = filteredUsers.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const filteredUsers = users.filter(
+    (user) =>
+      (roleFilter !== "all" ? user.role === roleFilter : true) &&
+      (search ? user.fullname.toLowerCase().includes(search.toLowerCase()) : true) &&
+      filterByDate(user.createdAt, dateFilter),
+  ) as User[]
+
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage)
+  const paginatedUsers = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+
+  const handleBanUser = (): void => {
+    if (selectedUser) {
+      const updatedUsers = users.map((user) =>
+        user._id === selectedUser._id ? { ...user, banned: !user.banned } : user,
+      )
+      setUsers(updatedUsers)
+      setSelectedUser({ ...selectedUser, banned: !selectedUser.banned })
+      setBanDialogOpen(false)
+    }
+  }
+
+  const formatDate = (dateString: string | undefined): string => {
+    if (!dateString) return "N/A"
+    try {
+      return format(new Date(dateString), "MMM dd, yyyy")
+    } catch (error) {
+      return "Invalid Date"
+    }
+  }
+
+  const openPdfViewer = (url: string): void => {
+    setSelectedLicense(url)
+    setPdfDialogOpen(true)
+  }
 
   return (
     <div className="mt-10 p-4 w-full">
       <div className="flex flex-wrap gap-4 mb-4">
-        <Select value={roleFilter} onValueChange={(value) => { setRoleFilter(value); setCurrentPage(1); }}>
+        <Select
+          value={roleFilter}
+          onValueChange={(value) => {
+            setRoleFilter(value)
+            setCurrentPage(1)
+          }}
+        >
           <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="All Roles" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Roles</SelectItem>
-            <SelectItem value="Doctor">Doctor</SelectItem>
-            <SelectItem value="Patient">Patient</SelectItem>
+            <SelectItem value="doctor">Doctor</SelectItem>
+            <SelectItem value="patient">Patient</SelectItem>
           </SelectContent>
         </Select>
 
-        <Select value={dateFilter} onValueChange={(value) => { setDateFilter(value); setCurrentPage(1); }}>
+        <Select
+          value={dateFilter}
+          onValueChange={(value) => {
+            setDateFilter(value)
+            setCurrentPage(1)
+          }}
+        >
           <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="All Time" />
           </SelectTrigger>
@@ -109,135 +333,245 @@ const UserManagement = () => {
           </SelectContent>
         </Select>
 
-        <Input 
-          placeholder="Search by name..." 
-          value={search} 
-          onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }} 
-          className="w-[250px]" 
+        <Input
+          placeholder="Search by name..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value)
+            setCurrentPage(1)
+          }}
+          className="w-[250px]"
         />
       </div>
 
       <div className="">
-      <Table className="w-full">
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Address</TableHead>
-            <TableHead>Joined</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {paginatedUsers.length > 0 ? (
-            paginatedUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.id}</TableCell>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.address}</TableCell>
-                <TableCell>{user.joined}</TableCell>
-                <TableCell>{user.role}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="outline"
-                    className="bg-secondaryColor text-white"
-                    onClick={() =>
-                      setSelectedUser({
-                        ...user,
-                        phone: "555-1234",
-                        email: "user@example.com",
-                        gender: user.role === "Doctor" ? "Male" : "Female",
-                        age: user.role === "Doctor" ? 45 : 30,
-                        specialization: user.role === "Doctor" ? "Cardiology" : undefined,
-                        status: user.role === "Doctor" ? "Active" : undefined,
-                        license: user.role === "Doctor" ? "/license.pdf" : undefined,
-                        licenseVerified: user.role === "Doctor" ? true : undefined,
-                        rating: user.role === "Doctor" ? 4 : undefined,
-                      })
-                    }
-                  >
-                    More
-                  </Button>
+        <Table className="w-full">
+          <TableHeader>
+            <TableRow>
+              {/* <TableHead>ID</TableHead> */}
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Phone</TableHead>
+              <TableHead>Joined</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {paginatedUsers.length > 0 ? (
+              paginatedUsers.map((user) => (
+                <TableRow key={user._id}>
+                  {/* <TableCell className="font-mono">{user._id.substring(0, 8)}</TableCell> */}
+                  <TableCell>{user.fullname}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.phoneNumber}</TableCell>
+                  <TableCell>{formatDate(user.createdAt)}</TableCell>
+                  <TableCell>
+                    <Badge variant="default" className="capitalize">
+                      {user.role === "doctor" ? "Doctor" : "Patient"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={user.banned ? "destructive" : "outline"}>{user.banned ? "Banned" : "Active"}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      className="bg-secondaryColor text-white"
+                      onClick={() => setSelectedUser(user)}
+                    >
+                      More
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-4">
+                  No users found.
                 </TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={6} className="text-center py-4">
-                No users found.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            )}
+          </TableBody>
+        </Table>
 
-      {totalPages > 1 && (
-        <Pagination className="">
-          <PaginationContent>
-            <PaginationPrevious onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} />
-            {[...Array(totalPages)].map((_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink isActive={currentPage === i + 1} onClick={() => setCurrentPage(i + 1)}>
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationNext onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} />
-          </PaginationContent>
-        </Pagination>
-      )}
+        {totalPages > 1 && (
+          <Pagination className="mt-4">
+            <PaginationContent>
+              <PaginationPrevious onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} />
+              {Array.from({ length: totalPages }, (_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink isActive={currentPage === i + 1} onClick={() => setCurrentPage(i + 1)}>
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationNext onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} />
+            </PaginationContent>
+          </Pagination>
+        )}
       </div>
 
+      {/* User Details Dialog */}
       {selectedUser && (
-        <Dialog open={true} onOpenChange={(open) => { if (!open) setSelectedUser(null); }}>
-          <DialogContent>
+        <Dialog
+          open={!!selectedUser}
+          onOpenChange={(open) => {
+            if (!open) setSelectedUser(null)
+          }}
+        >
+          <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>{selectedUser.role} Details</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                {selectedUser.fullname}
+                <Badge variant={selectedUser.role === "doctor" ? "default" : "default"}>
+                  {selectedUser.role === "doctor" ? "Doctor" : "Patient"}
+                </Badge>
+                {selectedUser.banned && <Badge variant="destructive">Banned</Badge>}
+              </DialogTitle>
             </DialogHeader>
-            <div className="space-y-2">
-              <p><span className="font-bold">Full Name</span>: {selectedUser.name}</p>
-              <p><span className="font-bold">Phone</span>: {selectedUser.phone}</p>
-              <p><span className="font-bold">Email</span>: {selectedUser.email}</p>
-              <p><span className="font-bold">Gender</span>: {selectedUser.gender}</p>
-              <p><span className="font-bold">Age</span>: {selectedUser.age}</p>
-              <p><span className="font-bold">Role</span>: {selectedUser.role}</p>
-              <p><span className="font-bold">Joined</span>: {selectedUser.joined}</p>
-              {selectedUser.role === "Doctor" && (
+            <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+              <p>
+                <span className="font-bold">Email</span>: {selectedUser.email}
+              </p>
+              <p>
+                <span className="font-bold">Phone</span>: {selectedUser.phoneNumber}
+              </p>
+              <p>
+                <span className="font-bold">Gender</span>: {selectedUser.gender}
+              </p>
+              <p>
+                <span className="font-bold">Age</span>: {selectedUser.age}
+              </p>
+              <p>
+                <span className="font-bold">Joined</span>: {formatDate(selectedUser.createdAt)}
+              </p>
+
+              {/* Doctor-specific fields */}
+              {selectedUser.role === "doctor" && (
                 <>
-                  <p><span className="font-bold">Specialization</span>: {selectedUser.specialization}</p>
-                  <p><span className="font-bold">Status</span>: {selectedUser.status}</p>
                   <p>
-                  <span className="font-bold">License Document</span>
-                    :{" "}
-                    <Link href={selectedUser.license} target="_blank" rel="noreferrer" className="text-blue-500 underline">
-                      View
-                    </Link>{" "}
-                    ({selectedUser.licenseVerified ? "Verified" : "Not Verified"})
+                    <span className="font-bold">Specializations</span>:{" "}
+                    {selectedUser.specializations?.join(", ") || "None"}
                   </p>
-                  <p className="flex items-center">
-                  <span className="font-bold">Rating</span>: {Array.from({ length: 5 }, (_, i) => i < selectedUser.rating ? <FaStar key={i} color="orange" /> : <FaRegStar key={i} color="orange" />)}
+                  <p>
+                    <span className="font-bold">Qualifications</span>:{" "}
+                    {selectedUser.qualifications?.join(", ") || "None"}
                   </p>
+                  <p>
+                    <span className="font-bold">Status</span>: {selectedUser.status}
+                  </p>
+
+                  {selectedUser.hospital && (
+                    <div className="mt-2">
+                      <p className="font-bold">Hospital Information:</p>
+                      <p className="ml-4">Name: {selectedUser.hospital.name}</p>
+                      <p className="ml-4">Branch: {selectedUser.hospital.branch}</p>
+                      {selectedUser.hospital.address && (
+                        <div className="ml-4">
+                          <p>
+                            Address: {selectedUser.hospital.address.street}, {selectedUser.hospital.address.city}
+                          </p>
+                          <p>
+                            {selectedUser.hospital.address.region}, {selectedUser.hospital.address.country}{" "}
+                            {selectedUser.hospital.address.postalCode}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {selectedUser.licenses && selectedUser.licenses.length > 0 && (
+                    <div className="mt-2">
+                      <p className="font-bold">Licenses:</p>
+                      {selectedUser.licenses.map((license, index) => (
+                        <div key={license._id || index} className="ml-4 flex items-center gap-2">
+                          <Button
+                            variant="link"
+                            className="p-0 h-auto text-blue-500"
+                            onClick={() => openPdfViewer(license.url)}
+                          >
+                            View License
+                          </Button>
+                          <Badge variant={license.isVerified ? "default" : "outline"}>
+                            {license.isVerified ? "Verified" : "Not Verified"}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </>
               )}
-              {selectedUser.role === "Patient" && (
-                <p><span className="font-bold">Address</span>: {selectedUser.address}</p>
+
+              {/* Patient-specific fields */}
+              {selectedUser.role === "patient" && (
+                <>
+                  <p>
+                    <span className="font-bold">Height</span>: {selectedUser.height} cm
+                  </p>
+                  <p>
+                    <span className="font-bold">Weight</span>: {selectedUser.weight} kg
+                  </p>
+                  <p>
+                    <span className="font-bold">Blood Type</span>: {selectedUser.blood}
+                  </p>
+                  {selectedUser.nationality && (
+                    <p>
+                      <span className="font-bold">Nationality</span>: {selectedUser.nationality}
+                    </p>
+                  )}
+
+                  {selectedUser.medicalConditions && selectedUser.medicalConditions.length > 0 && (
+                    <div className="mt-2">
+                      <p className="font-bold">Medical Conditions:</p>
+                      <ul className="list-disc ml-6">
+                        {selectedUser.medicalConditions.map((condition, index) => (
+                          <li key={index}>{condition}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {selectedUser.pastTreatments && selectedUser.pastTreatments.length > 0 && (
+                    <div className="mt-2">
+                      <p className="font-bold">Past Treatments:</p>
+                      <ul className="list-disc ml-6">
+                        {selectedUser.pastTreatments.map((treatment, index) => (
+                          <li key={index}>{treatment}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {selectedUser.majorAccidents && selectedUser.majorAccidents.length > 0 && (
+                    <div className="mt-2">
+                      <p className="font-bold">Major Accidents:</p>
+                      <ul className="list-disc ml-6">
+                        {selectedUser.majorAccidents.map((accident, index) => (
+                          <li key={index}>{accident}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {selectedUser.allergies && selectedUser.allergies.length > 0 && (
+                    <div className="mt-2">
+                      <p className="font-bold">Allergies:</p>
+                      <ul className="list-disc ml-6">
+                        {selectedUser.allergies.map((allergy, index) => (
+                          <li key={index}>{allergy}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </>
               )}
             </div>
             <DialogFooter>
-              {selectedUser.role === "Doctor" && (
-                <Button
-                  variant="destructive"
-                  onClick={() => {
-                    if (selectedUser) {
-                      const newStatus = selectedUser.status === "Active" ? "Banned" : "Active";
-                      setSelectedUser({ ...selectedUser, status: newStatus });
-                    }
-                  }}
-                >
-                  {selectedUser.status === "Active" ? "Ban" : "Resume"}
-                </Button>
-              )}
+              <Button variant="destructive" onClick={() => setBanDialogOpen(true)}>
+                {selectedUser.banned ? "Unban User" : "Ban User"}
+              </Button>
               <DialogClose asChild>
                 <Button>Close</Button>
               </DialogClose>
@@ -245,8 +579,46 @@ const UserManagement = () => {
           </DialogContent>
         </Dialog>
       )}
-    </div>
-  );
-};
 
-export default UserManagement;
+      {/* PDF Viewer Dialog */}
+      {pdfDialogOpen && (
+        <Dialog open={pdfDialogOpen} onOpenChange={setPdfDialogOpen}>
+          <DialogContent className="max-w-4xl h-[80vh]">
+            <DialogHeader>
+              <DialogTitle>License Document</DialogTitle>
+            </DialogHeader>
+            <div className="h-full w-full">
+              <iframe src={selectedLicense} className="w-full h-[60vh]" title="License PDF" />
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button>Close</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Ban Confirmation Dialog */}
+      <AlertDialog open={banDialogOpen} onOpenChange={setBanDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{selectedUser?.banned ? "Unban User" : "Ban User"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedUser?.banned
+                ? "Are you sure you want to unban this user? They will regain access to the platform."
+                : "Are you sure you want to ban this user? They will lose access to the platform."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBanUser}>{selectedUser?.banned ? "Unban" : "Ban"}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  )
+}
+
+export default UserManagement
+

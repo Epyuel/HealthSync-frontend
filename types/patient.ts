@@ -24,3 +24,25 @@ export interface PatientSignupPayload {
 }
 
 
+export interface PatientResponse {
+        bookmarks: any[]; 
+        banned: boolean;
+        _id: string;
+        firstname: string;
+        lastname: string;
+        email: string;
+        age: number;
+        role: "patient";
+        height: number;
+        weight: number;
+        blood: string;
+        gender: "male" | "female" 
+        phoneNumber: string;
+        medicalConditions: string[];
+        pastTreatments: string[];
+        majorAccidents: string[];
+        allergies: string[];
+        __v: number;
+        createdAt: string; 
+        
+}

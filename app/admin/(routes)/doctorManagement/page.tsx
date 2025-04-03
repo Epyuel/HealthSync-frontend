@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 import IncomingLicenses from '@/components/admin-components/IncomingLicenses';
 import AcceptedLicenses from '@/components/admin-components/AcceptedLicenses';
 import DeniedLicenses from '@/components/admin-components/DeniedLicenses';
-import BannedUsers from '@/components/admin-components/BannedUser';
 
 
 const DoctorManagement = () => {
@@ -17,16 +16,14 @@ const DoctorManagement = () => {
           <div className="col-md-3">
             <div className="list-group flex items-center justify-between border-b-2">
               <Link href="" className={`list-group-item list-group-item-action italic ${index === 0 ? "border-b-4 border-primaryColor text-secondaryColor" : ""}`} onClick={() => setindex(0)}>Incoming License Verification</Link>
-              <Link href="" className={`list-group-item list-group-item-action italic ${index === 1 ? "border-b-4 border-primaryColor text-secondaryColor" : ""}`} onClick={() => setindex(1)}>Accepted Licenses</Link>
-              <Link href="" className={`list-group-item list-group-item-action italic ${index === 2 ? "border-b-4 border-primaryColor text-secondaryColor" : ""}`} onClick={() => setindex(2)}>Denied Licenses</Link>
-              <Link href="" className={`list-group-item list-group-item-action italic ${index === 3 ? "border-b-4 border-primaryColor text-secondaryColor" : ""}`} onClick={() => setindex(3)}>Banned users</Link>
+              <Link href="" className={`list-group-item list-group-item-action italic ${index === 1 ? "border-b-4 border-primaryColor text-secondaryColor" : ""}`} onClick={() => setindex(1)}>Accepted Doctors (License)</Link>
+              <Link href="" className={`list-group-item list-group-item-action italic ${index === 2 ? "border-b-4 border-primaryColor text-secondaryColor" : ""}`} onClick={() => setindex(2)}>Denied Doctors (License)</Link>
             </div>
           </div>
           <div className="col-md-9">
             {index === 0 && <IncomingLicenses />}
             {index === 1 && <AcceptedLicenses />}
             {index === 2 && <DeniedLicenses />}
-            {index === 3 && <BannedUsers />}
           </div>
         </div>
       </div>
