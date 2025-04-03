@@ -1,7 +1,8 @@
-import { PatientLoginPayload } from "@/types/patient";
+import { PatientLoginPayload,PatientResponse } from "@/types/patient";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { PatientSignupPayload } from "@/types/patient";
 import { VisitModel } from "@/components/models/visitModel";
+import { use } from "react";
 
 export const patientApi = createApi({
   reducerPath: "patientApi",
@@ -39,7 +40,11 @@ export const patientApi = createApi({
         body: visit
         }),
     }),
-
+    
+getPatients: builder.query<{ data: { patients: PatientResponse[] } }, void>({
+  query: () => '/patients',
+  providesTags: ['Patient'],
+}),
     // DELETE
     deletePatient: builder.mutation<void, void>({
       query: () => ({
@@ -63,7 +68,9 @@ export const {
   useLoginPatientMutation,
   useRegisterPatientMutation,
   useDeletePatientMutation,
-  useRequestVisitMutation
+  useRequestVisitMutation,
+  useGetPatientsQuery,
+  useGetPatientByIdQuery,
 } = patientApi;
 
 export const fetchPatient = async (_id:string) => {

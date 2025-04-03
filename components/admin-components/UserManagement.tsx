@@ -26,6 +26,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { useGetDoctorsQuery } from "@/redux/api/doctorApi";
+import { useGetPatientsQuery } from "@/redux/api/patientApi";
 
 // Define the PatientResponse type
 interface PatientResponse {
@@ -131,72 +133,6 @@ type User = (PatientResponse | DoctorResponse) & {
   nationality?: string
 }
 
-// Sample data structure from backend
-const sampleData = {
-  patients: [
-    {
-      bookmarks: [],
-      banned: false,
-      _id: "67a0798ee48d2c496dffef6f",
-      firstname: "test",
-      lastname: "test",
-      email: "test@gmail.com",
-      age: 33,
-      height: 102,
-      weight: 35,
-      blood: "B+",
-      gender: "male",
-      phoneNumber: "251942512868",
-      medicalConditions: [],
-      pastTreatments: [],
-      majorAccidents: [],
-      allergies: [],
-      __v: 0,
-      createdAt: "2024-01-12T10:27:14.156Z",
-    }
-  ],
-  doctors: [
-    {
-      bookmarks: [],
-      status: "pending",
-      banned: false,
-      _id: "67eb15297db753f356e1173e",
-      firstname: "daniel",
-      lastname: "teka",
-      email: "dani@gmail.com",
-      age: 34,
-      gender: "male",
-      phoneNumber: "251987654321",
-      specializations: ["Orthopedics"],
-      qualifications: ["MCh"],
-      licenses: [
-        {
-          url: "https://res.cloudinary.com/drz9aa55k/image/upload/v1743459612/yzs7uqn5gmhxlldpaeje.pdf",
-          type: "pdf",
-          isVerified: false,
-          _id: "67eb15297db753f356e1173f",
-        },
-      ],
-      hospital: {
-        address: {
-          street: "Bethel PO BOX 127",
-          city: "Addis Ababa",
-          region: "Addis Ababa",
-          country: "Ethiopia",
-          postalCode: "35324",
-        },
-        _id: "67e83e268439394e7ff2ee53",
-        name: "Bethel General Hospital",
-        branch: 2,
-        __v: 0,
-      },
-      createdAt: "2025-03-31T22:20:25.702Z",
-      updatedAt: "2025-03-31T22:20:25.702Z",
-      __v: 0,
-    },
-  ],
-}
-
 const mergeUsersData = (patients: PatientResponse[], doctors: DoctorResponse[]): User[] => {
   const patientsWithRole = patients.map((patient) => ({
     ...patient,
@@ -243,6 +179,13 @@ const filterByDate = (joined: string | undefined, filter: string): boolean => {
 }
 
 const UserManagement = () => {
+  // Fetch data using RTK Query hooks
+  const { data: doctorsData, isLoading: isLoadingDoctors } = useGetDoctorsQuery()
+  const { data: patientsData, isLoading: isLoadingPatients } = useGetPatientsQuery()
+
+  console.log("Doctors Data:", doctorsData)
+  console.log("Patients Data:", patientsData)
+  
   const [users, setUsers] = useState<User[]>([])
   const [search, setSearch] = useState("")
   const [roleFilter, setRoleFilter] = useState("all")
@@ -255,9 +198,22 @@ const UserManagement = () => {
   const itemsPerPage = 6
 
   useEffect(() => {
-    const mergedUsers = mergeUsersData(sampleData.patients, sampleData.doctors)
-    setUsers(mergedUsers)
-  }, [])
+    if (doctorsData && patientsData) {
+      // Handle nested data structure
+      const doctors = doctorsData.data?.doctors || doctorsData.data?.doctors || doctorsData
+      const patients = patientsData.data?.patients || patientsData.data?.patients || patientsData
+      
+      console.log("Processed doctors:", doctors)
+      console.log("Processed patients:", patients)
+      
+      const mergedUsers = mergeUsersData(
+        Array.isArray(patients) ? patients : [],
+        Array.isArray(doctors) ? doctors : []
+      )
+      
+      setUsers(mergedUsers)
+    }
+  }, [doctorsData, patientsData])
 
   const filteredUsers = users.filter(
     (user) =>
@@ -292,6 +248,10 @@ const UserManagement = () => {
   const openPdfViewer = (url: string): void => {
     setSelectedLicense(url)
     setPdfDialogOpen(true)
+  }
+
+  if (isLoadingDoctors || isLoadingPatients) {
+    return <div>Loading users...</div>
   }
 
   return (
@@ -348,7 +308,6 @@ const UserManagement = () => {
         <Table className="w-full">
           <TableHeader>
             <TableRow>
-              {/* <TableHead>ID</TableHead> */}
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>
@@ -362,7 +321,6 @@ const UserManagement = () => {
             {paginatedUsers.length > 0 ? (
               paginatedUsers.map((user) => (
                 <TableRow key={user._id}>
-                  {/* <TableCell className="font-mono">{user._id.substring(0, 8)}</TableCell> */}
                   <TableCell>{user.fullname}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.phoneNumber}</TableCell>
@@ -621,4 +579,3 @@ const UserManagement = () => {
 }
 
 export default UserManagement
-
