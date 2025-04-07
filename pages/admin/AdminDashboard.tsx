@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import DashGraph from "@/components/admin-components/DashGraph";
 import StatCard from "@/components/admin-components/StatCard";
