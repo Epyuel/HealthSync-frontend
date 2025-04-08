@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { DoctorLoginPayload, DoctorSignupPayload } from "@/types/doctor";
-
+// import { get } from "http";
+import { DoctorApiResponse } from "@/types/doctor";
 
 export const doctorApi = createApi({
   reducerPath: "doctorApi",
@@ -64,6 +65,10 @@ export const doctorApi = createApi({
         method: 'GET',
       }),
     }),
+    getCurrentDoctor: builder.query<DoctorApiResponse, void>({
+  query: () => '/doctors/me',
+  providesTags: ['Doctor'],
+}),
     
   
   }),
@@ -74,7 +79,8 @@ export const {
   useLoginDoctorMutation,
   useRegisterDoctorMutation,
   useGetVerifiedDoctorsQuery,
-  useDeleteDoctorMutation
+  useDeleteDoctorMutation,
+  useGetCurrentDoctorQuery,
 } = doctorApi;
 
 export const fetchDoctor = async (_id:string) => {

@@ -3,7 +3,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import ErrorMessage from "../status/ErrorMessage";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { signOut } from "next-auth/react";
 
 export default function Logout() {
   const [logout, { isLoading, error }] = useLogoutMutation();
@@ -12,7 +11,7 @@ export default function Logout() {
   const handleLogout = async () => {
     try {
       await logout({}).unwrap();
-      signOut({redirect:false});
+      localStorage.removeItem('role');
       router.push("/");
     } catch (err) {
       console.error("Logout failed:", err);

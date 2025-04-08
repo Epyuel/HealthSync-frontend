@@ -9,6 +9,7 @@ export interface DoctorModel extends Omit<UserModel,'role'> {
     qualifications: string[];
     licenses: LicenseModel[];
     role: string;
+    hospital: HospitalModel;
 }
 
 export interface LicenseModel {
@@ -16,3 +17,20 @@ export interface LicenseModel {
     type: string;
     isVerified?: boolean;
 }
+
+
+interface HospitalModel {
+    address: {
+        street: string;
+        city: string;
+        region: string;
+        country: string;
+        postalCode: string;
+    };
+    _id: string;
+    name: string;
+    branch: number;
+    __v: number;
+}
+
+

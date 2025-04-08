@@ -121,8 +121,8 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
                         </Row>
                       </Row>
                       <Row className='gap-x-3 gap-y-2 justify-between mt-2'>
-                        <span className='text-sm text-gray-500'>📍 {'Addis Ababa'}</span>
-                        <span className='text-sm text-gray-500'>🏨 {'Tikur Anbesa'}</span>
+                        <span className='text-sm text-gray-500'>📍 {doctor?.hospital.address.city}</span>
+                        <span className='text-sm text-gray-500'>🏨 {doctor?.hospital.name}</span>
                         <span className='text-sm text-gray-500'>🩺 {doctor.specializations.join(', ')}</span>
                       </Row>
                     </li>

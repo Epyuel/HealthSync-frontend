@@ -21,10 +21,12 @@ export default function RootLayout({
       <html lang="en">
         <body className={inter.className}>
           <StoreProvider store={store} >
-            <NextAuthSessionProvider>
-              {children}
-              <Toaster />
-            </NextAuthSessionProvider> 
+            {/* <CookieProvider cookie={getCookie()}> */}
+              <NextAuthSessionProvider>
+                {children}
+                <Toaster />
+              </NextAuthSessionProvider> 
+            {/* </CookieProvider> */}
           </StoreProvider>
         </body>
       </html>

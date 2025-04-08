@@ -5,7 +5,7 @@ import { AnimatePresence } from 'framer-motion';
 import GettingStarted from "./Home";
 import Auth from "../auth/Auth";
 
-const Landing = ()=>{
+const Landing = () => {
     const [showSecondPage, setShowSecondPage] = useState(false);
 
     const slideUpAnimation = {
@@ -19,19 +19,21 @@ const Landing = ()=>{
         <>
             <div className="relative h-screen overflow-hidden">
                 <AnimatePresence>
-                    {
-                        !showSecondPage?
+                    {!showSecondPage ? (
                         <GettingStarted
                             key="firstPage" 
                             slideUpAnimation={slideUpAnimation} 
                             setShowSecondPage={setShowSecondPage}
                         />
-                        :<Auth  key="secondPage" slideUpAnimation={slideUpAnimation} />
-                    }
+                    ) : (
+                        <Auth 
+                            key="secondPage" 
+                            slideUpAnimation={slideUpAnimation}
+                            setShowSecondPage={setShowSecondPage}
+                        />
+                    )}
                 </AnimatePresence>
-
             </div>
-
         </>
     )
 }

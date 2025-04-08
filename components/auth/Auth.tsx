@@ -11,10 +11,15 @@ type SlideUpAnimationProb = {
     exit:any,
     transition:any
 }
+type AuthProps = {
+    slideUpAnimation: SlideUpAnimationProb;
+    setShowSecondPage?: (value: boolean) => void
+};
+// const Auth = ({slideUpAnimation}:{slideUpAnimation:SlideUpAnimationProb})=>{
+//     const [tab,setTab] = useState<0|1>(0);
+const Auth = ({ slideUpAnimation, setShowSecondPage }: AuthProps) => {
+    const [tab, setTab] = useState<0 | 1>(0);
 
-const Auth = ({slideUpAnimation}:{slideUpAnimation:SlideUpAnimationProb})=>{
-    const [tab,setTab] = useState<0|1>(0);
-    
     return (
         <motion.div
             key="secondPage"
@@ -28,7 +33,7 @@ const Auth = ({slideUpAnimation}:{slideUpAnimation:SlideUpAnimationProb})=>{
                 <Row className="w-full md:w-[85%] h-fit bg-neutral-100 py-10 flex flex-col md:flex-row">
                     {/* Health sync text */}
                     <Box className="w-full md:w-[50%] h-auto flex justify-center items-center flex-col gap-11 p-4 md:p-0">
-                        <Typography className="text-primary text-7xl font-bold max-sm:text-xl max-sm:flex-[0.6]">
+                        <Typography className="text-primary text-7xl font-bold max-sm:text-xl max-sm:flex-[0.6] cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setShowSecondPage?.(false)}>
                           Health<span className="text-accent">Sync</span>
                         </Typography>
                         <Typography className="text-center w-[70%]">

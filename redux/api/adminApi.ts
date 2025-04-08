@@ -48,12 +48,23 @@ export const adminApi = createApi({
       }),
     }),
 
+    // endpoint to display the stat chart in the admin dashboard
+    getStatInfo: builder.query<any, { year: number }>({
+      query: ({ year }) => ({
+        url: `/figures/engagements?year=${year}`,
+        method: 'GET' 
+      }),     
+    }),
+
   }),
 });
 
 export const {
   useLoginAdminMutation,
-  useGetAllPatientsQuery
+  useGetAllPatientsQuery,
+  useGetAllDoctorsQuery,
+  useGetAdminByIdQuery,
+  useGetStatInfoQuery,
 } = adminApi;
 
 export const fetchAdmin = async (_id:string) => {
