@@ -1,7 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { AdminLoginPayload } from "@/types/admin";
 
-
 export const adminApi = createApi({
   reducerPath: "adminApi",
   baseQuery: fetchBaseQuery({
@@ -14,37 +13,36 @@ export const adminApi = createApi({
   }),
   tagTypes: ["Admin"],
   endpoints: (builder) => ({
-
     // for admin to login
     loginAdmin: builder.mutation<any, AdminLoginPayload>({
-        query: (admin) => ({
-          url: '/login/admin',
-          method: 'POST',
-          body: admin
-        }),
+      query: (admin) => ({
+        url: "/login/admin",
+        method: "POST",
+        body: admin,
+      }),
     }),
 
     // for admin to get all the patients. it is paginated
-    getAllPatients: builder.query<any, {page:number,limit:number}>({
-      query: ({page,limit}) => ({
+    getAllPatients: builder.query<any, { page: number; limit: number }>({
+      query: ({ page, limit }) => ({
         url: `/patients?page=${page}&limit=${limit}`,
-        method: 'GET' 
-      }),     
+        method: "GET",
+      }),
     }),
 
     // for admin to get all the doctors. it is paginated
-    getAllDoctors: builder.query<any, {page:number,limit:number}>({
-      query: ({page,limit}) => ({
+    getAllDoctors: builder.query<any, { page: number; limit: number }>({
+      query: ({ page, limit }) => ({
         url: `/doctors?page=${page}&limit=${limit}`,
-        method: 'GET' 
-      })      
+        method: "GET",
+      }),
     }),
 
     // to get a patient by id
     getAdminById: builder.query<any, string>({
       query: (id) => ({
         url: `/admin/${id}`,
-        method: 'GET',
+        method: "GET",
       }),
     }),
 
@@ -52,10 +50,17 @@ export const adminApi = createApi({
     getStatInfo: builder.query<any, { year: number }>({
       query: ({ year }) => ({
         url: `/figures/engagements?year=${year}`,
-        method: 'GET' 
-      }),     
+        method: "GET",
+      }),
     }),
 
+    // endpoint to display the user stat in the admin dashboard
+    getUsersStat: builder.query<any, void>({
+      query: () => ({
+        url: `/figures/users`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -65,15 +70,18 @@ export const {
   useGetAllDoctorsQuery,
   useGetAdminByIdQuery,
   useGetStatInfoQuery,
+  useGetUsersStatQuery,
 } = adminApi;
 
-export const fetchAdmin = async (_id:string) => {
+export const fetchAdmin = async (_id: string) => {
   try {
     // Importing store dynamically since there is circular dependency between adminApi.ts and store.tsx
     const storeModule = await import("../store");
     const store = storeModule.default;
 
-    const result = await store.dispatch(adminApi.endpoints.getAdminById.initiate(_id));
+    const result = await store.dispatch(
+      adminApi.endpoints.getAdminById.initiate(_id)
+    );
 
     if ("error" in result) {
       console.error("Error fetching doctors:", result.error);
@@ -87,13 +95,23 @@ export const fetchAdmin = async (_id:string) => {
   }
 };
 
-export const loginAdmin = async (password:string,phone?:string,email?:string) => {
+export const loginAdmin = async (
+  password: string,
+  phone?: string,
+  email?: string
+) => {
   try {
     // Importing store dynamically since there is circular dependency between adminApi.ts and store.tsx
     const storeModule = await import("../store");
     const store = storeModule.default;
 
-    const result = await store.dispatch(adminApi.endpoints.loginAdmin.initiate({...(phone?{phone}:{}),password,...(email?{email}:{})}));
+    const result = await store.dispatch(
+      adminApi.endpoints.loginAdmin.initiate({
+        ...(phone ? { phone } : {}),
+        password,
+        ...(email ? { email } : {}),
+      })
+    );
 
     if ("error" in result) {
       console.error("Error fetching doctors:", result.error);

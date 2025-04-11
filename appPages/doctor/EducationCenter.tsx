@@ -112,7 +112,7 @@ const EducationCenter = () => {
   );
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
+    <div className="p-4 mx-auto">
       {/* Blog Creation Form */}
       <div className="bg-gradient-to-r from-orange-50 to-emerald-50 rounded-2xl shadow-lg p-6 flex items-start mb-6">
       <Image
@@ -181,7 +181,7 @@ const EducationCenter = () => {
           {sortedBlogs.map((blog) => (
             <div 
               key={blog._id} 
-              className={`relative group rounded-lg transition-colors cursor-pointer  w-full max-w-5xl min-h-[100px] p-4 shadow-md ${
+              className={`relative group rounded-lg transition-colors cursor-pointer  w-full min-h-[100px] p-4 shadow-md ${
                 blog.author === doctorId 
                   ? "bg-emerald-50 border-l-4 border-emerald-500 hover:bg-emerald-100" 
                   : "bg-orange-50 border-l-4 border-orange-200 hover:bg-orange-100"

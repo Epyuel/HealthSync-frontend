@@ -8,7 +8,6 @@ const UserManagementPage = () => {
   const [activeTab, setActiveTab] = useState("AllUsers")
   const [activeHospitalTab, setActiveHospitalTab] = useState("BannedDoc")
 
-  // Reset AllUsers tab to BannedDoc when switching main tabs
   useEffect(() => {
     if (activeTab === "AllUsers") {
       setActiveHospitalTab("BannedDoc")
@@ -36,7 +35,6 @@ const UserManagementPage = () => {
         <UserManagement />
       ) : (
         <div>
-          {/* Updated AllUsers sub-tabs container with full width on mobile */}
           <div className="w-full md:w-1/2 mx-auto mt-4 mb-4">
             <div className="flex">
               <div

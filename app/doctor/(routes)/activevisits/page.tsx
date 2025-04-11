@@ -1,4 +1,4 @@
-import ActiveVisits from '@/pages/doctor/ActiveVisits'
+import ActiveVisits from '@/appPages/doctor/ActiveVisits'
 import React from 'react'
 
 const page = () => {

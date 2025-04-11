@@ -2,8 +2,8 @@
 import Link from 'next/link';
 import React, { useState } from 'react'
 
-import Blog from '@/pages/patient/Blog';
-import SavedBlogs from '@/pages/patient/SavedBlogs';
+import Blog from '@/appPages/patient/Blog';
+import SavedBlogs from '@/appPages/patient/SavedBlogs';
 
 
 const Blogpage = () => {

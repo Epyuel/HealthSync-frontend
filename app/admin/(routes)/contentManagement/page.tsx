@@ -1,7 +1,7 @@
 "use client"
 import ContentManagement from "@/components/admin-components/ContentManagement"
-import AddHospitalPage from "@/pages/admin/AddHospitalPage"
-import HospitalInformationPage from "@/pages/admin/HospitalInformationPage"
+import AddHospitalPage from "@/appPages/admin/AddHospitalPage"
+import HospitalInformationPage from "@/appPages/admin/HospitalInformationPage"
 import { useState, useEffect } from "react"
 
 const Content = () => {

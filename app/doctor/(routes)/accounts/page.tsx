@@ -1,5 +1,5 @@
 import React from 'react'
-import Accounts from '@/pages/doctor/Accounts'
+import Accounts from '@/appPages/doctor/Accounts'
 
 const page = () => {
   return (

@@ -1,4 +1,4 @@
-import DiagnosisComponent from '@/pages/patient/DiagnosisComponent'
+import DiagnosisComponent from '@/appPages/patient/DiagnosisComponent'
 import React from 'react'
 
 const page = () => {

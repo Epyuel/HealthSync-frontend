@@ -26,8 +26,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { useGetAllDoctorsQuery } from "@/redux/api/adminApi"
+import { useGetAllPatientsQuery } from "@/redux/api/adminApi"
 
-// Define the PatientResponse type
 interface PatientResponse {
   bookmarks: any[]
   banned: boolean
@@ -47,10 +48,9 @@ interface PatientResponse {
   allergies: string[]
   __v: number
   createdAt: string
-  nationality?: string // Optional nationality field
+  nationality?: string
 }
 
-// Define the DoctorResponse type
 interface DoctorResponse {
   bookmarks: any[]
   status: string
@@ -88,7 +88,6 @@ interface DoctorResponse {
   __v: number
 }
 
-// Combined user type for merged data
 type User = (PatientResponse | DoctorResponse) & {
   fullname: string
   role?: string
@@ -131,89 +130,22 @@ type User = (PatientResponse | DoctorResponse) & {
   nationality?: string
 }
 
-// Sample data structure from backend
-const sampleData = {
-  patients: [
-    {
-      bookmarks: [],
-      banned: false,
-      _id: "67a0798ee48d2c496dffef6f",
-      firstname: "test",
-      lastname: "test",
-      email: "test@gmail.com",
-      age: 33,
-      height: 102,
-      weight: 35,
-      blood: "B+",
-      gender: "male",
-      phoneNumber: "251942512868",
-      medicalConditions: [],
-      pastTreatments: [],
-      majorAccidents: [],
-      allergies: [],
-      __v: 0,
-      createdAt: "2024-01-12T10:27:14.156Z",
-    }
-  ],
-  doctors: [
-    {
-      bookmarks: [],
-      status: "pending",
-      banned: false,
-      _id: "67eb15297db753f356e1173e",
-      firstname: "daniel",
-      lastname: "teka",
-      email: "dani@gmail.com",
-      age: 34,
-      gender: "male",
-      phoneNumber: "251987654321",
-      specializations: ["Orthopedics"],
-      qualifications: ["MCh"],
-      licenses: [
-        {
-          url: "https://res.cloudinary.com/drz9aa55k/image/upload/v1743459612/yzs7uqn5gmhxlldpaeje.pdf",
-          type: "pdf",
-          isVerified: false,
-          _id: "67eb15297db753f356e1173f",
-        },
-      ],
-      hospital: {
-        address: {
-          street: "Bethel PO BOX 127",
-          city: "Addis Ababa",
-          region: "Addis Ababa",
-          country: "Ethiopia",
-          postalCode: "35324",
-        },
-        _id: "67e83e268439394e7ff2ee53",
-        name: "Bethel General Hospital",
-        branch: 2,
-        __v: 0,
-      },
-      createdAt: "2025-03-31T22:20:25.702Z",
-      updatedAt: "2025-03-31T22:20:25.702Z",
-      __v: 0,
-    },
-  ],
-}
-
 const mergeUsersData = (patients: PatientResponse[], doctors: DoctorResponse[]): User[] => {
-  const patientsWithRole = patients.map((patient) => ({
+  const patientsWithRole = patients?.map((patient) => ({
     ...patient,
     role: "patient",
     fullname: `${patient.firstname} ${patient.lastname}`,
   }))
 
-  const doctorsWithRole = doctors.map((doctor) => ({
+  const doctorsWithRole = doctors?.map((doctor) => ({
     ...doctor,
     role: "doctor",
     fullname: `${doctor.firstname} ${doctor.lastname}`,
   }))
 
-  return [...patientsWithRole, ...doctorsWithRole]
+  return [...(patientsWithRole || []), ...(doctorsWithRole || [])]
 }
 
-// Function to filter users by joined date
 const filterByDate = (joined: string | undefined, filter: string): boolean => {
   if (!joined) return true
 
@@ -243,6 +175,17 @@ const filterByDate = (joined: string | undefined, filter: string): boolean => {
 }
 
 const UserManagement = () => {
+  const { data: getAllPatientsQuery, isLoading: isPatientsLoading } = useGetAllPatientsQuery({ page: 1, limit: 1000 })
+  const { data: getAllDoctorsQuery, isLoading: isDoctorsLoading } = useGetAllDoctorsQuery({ page: 1, limit: 1000 })
+
+  // console.log("patients bbom", getAllPatientsQuery?.data?.patients)
+  // console.log("doctors boom", getAllDoctorsQuery?.data?.doctors)
+
+  // const sampleData = {
+  //   patients: getAllPatientsQuery?.data?.patients || [],
+  //   doctors: getAllDoctorsQuery?.data?.doctors || [],
+  // }
+
   const [users, setUsers] = useState<User[]>([])
   const [search, setSearch] = useState("")
   const [roleFilter, setRoleFilter] = useState("all")
@@ -253,11 +196,12 @@ const UserManagement = () => {
   const [selectedLicense, setSelectedLicense] = useState("")
   const [banDialogOpen, setBanDialogOpen] = useState(false)
   const itemsPerPage = 6
+  const isLoading = isPatientsLoading || isDoctorsLoading
 
   useEffect(() => {
-    const mergedUsers = mergeUsersData(sampleData.patients, sampleData.doctors)
+    const mergedUsers = mergeUsersData(getAllPatientsQuery?.data?.patients, getAllDoctorsQuery?.data?.doctors)
     setUsers(mergedUsers)
-  }, [])
+  }, [getAllPatientsQuery, getAllDoctorsQuery])
 
   const filteredUsers = users.filter(
     (user) =>
@@ -271,7 +215,7 @@ const UserManagement = () => {
 
   const handleBanUser = (): void => {
     if (selectedUser) {
-      const updatedUsers = users.map((user) =>
+      const updatedUsers = users?.map((user) =>
         user._id === selectedUser._id ? { ...user, banned: !user.banned } : user,
       )
       setUsers(updatedUsers)
@@ -348,7 +292,6 @@ const UserManagement = () => {
         <Table className="w-full">
           <TableHeader>
             <TableRow>
-              {/* <TableHead>ID</TableHead> */}
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>
@@ -359,10 +302,35 @@ const UserManagement = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedUsers.length > 0 ? (
-              paginatedUsers.map((user) => (
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, index) => (
+                <TableRow key={`loading-${index}`}>
+                  <TableCell>
+                    <div className="h-5 w-32 bg-gray-200 animate-pulse rounded"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-5 w-40 bg-gray-200 animate-pulse rounded"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-5 w-28 bg-gray-200 animate-pulse rounded"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-5 w-24 bg-gray-200 animate-pulse rounded"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-5 w-16 bg-gray-200 animate-pulse rounded"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-5 w-16 bg-gray-200 animate-pulse rounded"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-8 w-16 bg-gray-200 animate-pulse rounded"></div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : paginatedUsers.length > 0 ? (
+              paginatedUsers?.map((user) => (
                 <TableRow key={user._id}>
-                  {/* <TableCell className="font-mono">{user._id.substring(0, 8)}</TableCell> */}
                   <TableCell>{user.fullname}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.phoneNumber}</TableCell>
@@ -396,7 +364,7 @@ const UserManagement = () => {
           </TableBody>
         </Table>
 
-        {totalPages > 1 && (
+        {!isLoading && totalPages > 1 && (
           <Pagination className="mt-4">
             <PaginationContent>
               <PaginationPrevious onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} />
@@ -448,7 +416,6 @@ const UserManagement = () => {
                 <span className="font-bold">Joined</span>: {formatDate(selectedUser.createdAt)}
               </p>
 
-              {/* Doctor-specific fields */}
               {selectedUser.role === "doctor" && (
                 <>
                   <p>
@@ -485,7 +452,7 @@ const UserManagement = () => {
                   {selectedUser.licenses && selectedUser.licenses.length > 0 && (
                     <div className="mt-2">
                       <p className="font-bold">Licenses:</p>
-                      {selectedUser.licenses.map((license, index) => (
+                      {selectedUser.licenses?.map((license, index) => (
                         <div key={license._id || index} className="ml-4 flex items-center gap-2">
                           <Button
                             variant="link"
@@ -504,7 +471,6 @@ const UserManagement = () => {
                 </>
               )}
 
-              {/* Patient-specific fields */}
               {selectedUser.role === "patient" && (
                 <>
                   <p>
@@ -526,7 +492,7 @@ const UserManagement = () => {
                     <div className="mt-2">
                       <p className="font-bold">Medical Conditions:</p>
                       <ul className="list-disc ml-6">
-                        {selectedUser.medicalConditions.map((condition, index) => (
+                        {selectedUser.medicalConditions?.map((condition, index) => (
                           <li key={index}>{condition}</li>
                         ))}
                       </ul>
@@ -537,7 +503,7 @@ const UserManagement = () => {
                     <div className="mt-2">
                       <p className="font-bold">Past Treatments:</p>
                       <ul className="list-disc ml-6">
-                        {selectedUser.pastTreatments.map((treatment, index) => (
+                        {selectedUser.pastTreatments?.map((treatment, index) => (
                           <li key={index}>{treatment}</li>
                         ))}
                       </ul>
@@ -548,7 +514,7 @@ const UserManagement = () => {
                     <div className="mt-2">
                       <p className="font-bold">Major Accidents:</p>
                       <ul className="list-disc ml-6">
-                        {selectedUser.majorAccidents.map((accident, index) => (
+                        {selectedUser.majorAccidents?.map((accident, index) => (
                           <li key={index}>{accident}</li>
                         ))}
                       </ul>
@@ -559,7 +525,7 @@ const UserManagement = () => {
                     <div className="mt-2">
                       <p className="font-bold">Allergies:</p>
                       <ul className="list-disc ml-6">
-                        {selectedUser.allergies.map((allergy, index) => (
+                        {selectedUser.allergies?.map((allergy, index) => (
                           <li key={index}>{allergy}</li>
                         ))}
                       </ul>
@@ -580,7 +546,6 @@ const UserManagement = () => {
         </Dialog>
       )}
 
-      {/* PDF Viewer Dialog */}
       {pdfDialogOpen && (
         <Dialog open={pdfDialogOpen} onOpenChange={setPdfDialogOpen}>
           <DialogContent className="max-w-4xl h-[80vh]">
@@ -599,7 +564,6 @@ const UserManagement = () => {
         </Dialog>
       )}
 
-      {/* Ban Confirmation Dialog */}
       <AlertDialog open={banDialogOpen} onOpenChange={setBanDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -621,4 +585,3 @@ const UserManagement = () => {
 }
 
 export default UserManagement
-

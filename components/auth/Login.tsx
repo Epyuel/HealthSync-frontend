@@ -4,10 +4,11 @@ import { Button, Divider, Form, Input, message, Row } from "antd";
 import { GoogleCircleFilled } from "@ant-design/icons";
 import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import { useRouter } from "next/navigation";
-import { useLoginDoctorMutation } from "@/redux/api/doctorApi";
-import { useLoginPatientMutation } from "@/redux/api/patientApi";
-import { signIn } from 'next-auth/react';
-import { useLoginAdminMutation } from "@/redux/api/adminApi";
+import { loginDoctor } from "@/redux/api/doctorApi";
+import { loginPatient } from "@/redux/api/patientApi";
+import { loginAdmin } from "@/redux/api/adminApi";
+import { useSessionUser } from "../context/Session";
+import { fetchMe } from "@/redux/api/commonApi";
                                     
 type LoginProb = {
   setTab: any;
@@ -19,7 +20,35 @@ interface FormValues {
   role: string;
 }
 
+export async function authenticateUser( password: string,role:'admin'|'patient'|'doctor',phone?: string,email?:string) {
+
+    let result:any = null;
+
+    switch(role){
+        case 'patient':
+            result = await loginPatient(password,phone,email)
+            break
+        case 'doctor':
+            result = await loginDoctor(password,phone,email)
+            break
+        case 'admin':
+            result = await loginAdmin(password,phone,email)
+            break
+    }
+
+    if (result) {
+        return {
+            id: result?.data?._id || "",
+            role,
+            user:result?.data
+        };
+    }
+
+    return null;
+}
+
 const Login = ({ setTab }: LoginProb) => {
+  const {setUser} = useSessionUser();
   const [form] = Form.useForm();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const router = useRouter();
@@ -41,30 +70,35 @@ const Login = ({ setTab }: LoginProb) => {
 
     try {
       setIsLoggingIn(true);
-      const result = await signIn('credentials', {
-          redirect: false,
-          ...credential,
-          role,
-          password
-      })
 
-      if (result?.error) {
+      const result = await authenticateUser(password,role,credential.phone,credential.email)
+
+      if (!result) {
           message.error("Incorrect credential")
+          setIsLoggingIn(false);
       } else {
           message.success("Login successful.")
-          // Push to dashboard route
-          router.push(
-            role=='doctor'?
-            "/doctor/dashboard"
-            :role=='patient'?
-            "/patient/dashboard"
-            :"/admin/dashboard"
-          );
+
+          localStorage.setItem('role',role=='admin'?role:role+'s')
+          const res = await fetchMe(role=='admin'?role:role+'s' as any)
+          if(res?.data){
+            setUser(res.data);
+            // Push to dashboard route
+            router.push(
+              role=='doctor'?
+              "/doctor/dashboard"
+              :role=='patient'?
+              "/patient/dashboard"
+              :"/admin/dashboard"
+            );
+          }else{
+            message.error('Something went wrong, please try again')
+            setIsLoggingIn(false);
+          }
       }
 
     } catch (error: any) {
       message.error(error?.data?.error || "An error occurred.");
-    } finally {
       setIsLoggingIn(false);
     }
   };
