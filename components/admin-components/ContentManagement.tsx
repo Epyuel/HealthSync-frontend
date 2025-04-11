@@ -14,56 +14,91 @@ import {
 } from "@/components/ui/pagination"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
-
-const blogData = [
-  {
-    id: 1,
-    author: "Dr. Abebe Bekele, M.S.",
-    role: "Orthopedic Specialist",
-    date: "04 Sep 2019, 09:35, Friday",
-    content:
-      "Eating a variety of foods from all food groups ensures that you get all necessary nutrients. It is important to include fruits, vegetables, grains, protein, and dairy in your diet. A balanced diet helps maintain a healthy weight, reduces the risk of chronic diseases, and promotes overall health.",
-  },
-  {
-    id: 2,
-    author: "Dr. Almaz Tadesse, M.S.",
-    role: "Orthopedic Specialist",
-    date: "04 Sep 2019, 09:35, Friday",
-    content:
-      "Regular physical activity can improve your muscle strength and boost your endurance. Exercise delivers oxygen and nutrients to your tissues and helps your cardiovascular system work more efficiently. It also helps to maintain a healthy weight, reduce the risk of chronic diseases, and improve mental health.",
-  },
-  {
-    id: 3,
-    author: "Dr. Biruk Alemu, M.S.",
-    role: "Orthopedic Specialist",
-    date: "04 Sep 2019, 09:35, Friday",
-    content:
-      "Adequate sleep is a key part of a healthy lifestyle and can benefit your heart, weight, mind, and more. It helps your body repair and be ready for another day. Poor sleep can lead to various health issues, including heart disease, diabetes, and depression.",
-  },
-  {
-    id: 4,
-    author: "Dr. Dagmawit Tesfaye, M.S.",
-    role: "Orthopedic Specialist",
-    date: "04 Sep 2019, 09:35, Friday",
-    content:
-      "Drinking enough water each day is crucial for many reasons: to regulate temperature, keep joints lubricated, prevent infections, deliver nutrients to cells, and keep organs functioning properly. Staying hydrated improves sleep quality, cognition, and mood. It also helps to maintain a healthy weight and prevent kidney stones.",
-  },
-  {
-    id: 5,
-    author: "Dr. Fikre Mekonnen, M.S.",
-    role: "Orthopedic Specialist",
-    date: "04 Sep 2019, 09:35, Friday",
-    content:
-      "A balanced diet is one that gives your body the nutrients it needs to function correctly. It is important to get the right amount of nutrients from each food group. This includes consuming the right portions of fruits, vegetables, grains, protein, and dairy. A balanced diet helps to maintain a healthy weight and reduce the risk of chronic diseases.",
-  },
-]
+import { useGetBlogsQuery, useDeleteBlogPostMutation } from "@/redux/api/blogApi"
+import { toast } from "react-hot-toast"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 const ContentManagement = () => {
   const ITEMS_PER_PAGE = 3
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState("")
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [blogToDelete, setBlogToDelete] = useState<string | null>(null)
 
-  const filteredBlogs = blogData.filter(
+  // Fetch blogs from backend
+  const { data: blogsData, isLoading, isError, refetch } = useGetBlogsQuery({})
+  const [deleteBlogPost] = useDeleteBlogPostMutation()
+
+  const handleDeleteClick = (blogId: string) => {
+    setBlogToDelete(blogId)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!blogToDelete) return
+    
+    try {
+      await deleteBlogPost(blogToDelete).unwrap()
+      toast.success("Blog deleted successfully")
+      refetch() // Refresh the list after deletion
+    } catch (error) {
+      toast.error("Failed to delete blog")
+      console.error("Delete error:", error)
+    } finally {
+      setDeleteDialogOpen(false)
+      setBlogToDelete(null)
+    }
+  }
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+    setCurrentPage(1)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-6 bg-gray-50 min-h-screen">
+        <h1 className="text-2xl font-bold mb-6 text-gray-800">Manage Blog</h1>
+        <p>Loading blogs...</p>
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="container mx-auto p-6 bg-gray-50 min-h-screen">
+        <h1 className="text-2xl font-bold mb-6 text-gray-800">Manage Blog</h1>
+        <p className="text-red-500">Error loading blogs. Please try again later.</p>
+      </div>
+    )
+  }
+
+  // Transform the API response data to match our frontend structure
+  const transformedBlogs = blogsData?.data?.blogs?.map(blog => ({
+    id: blog._id,
+    author: blog.author,
+    role: "Orthopedic Specialist", // You might want to fetch this from the user data
+    date: new Date(blog.publishedAt).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+      weekday: 'long',
+      hour: '2-digit',
+      minute: '2-digit'
+    }),
+    content: blog.content
+  })) || []
+
+  const filteredBlogs = transformedBlogs.filter(
     (blog) =>
       blog.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
       blog.author.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -73,16 +108,14 @@ const ContentManagement = () => {
     setCurrentPage(page)
   }
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value)
-    setCurrentPage(1)
-  }
-
   const totalPages = Math.ceil(filteredBlogs.length / ITEMS_PER_PAGE)
-  const paginatedBlogs = filteredBlogs.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+  const paginatedBlogs = filteredBlogs.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
 
-return (
-  <div className="container mx-auto p-6 bg-gray-50 min-h-screen">
+  return (
+    <div className="container mx-auto p-6 bg-gray-50 min-h-screen">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Manage Blog</h1>
 
       <div className="relative mb-6">
@@ -110,6 +143,8 @@ return (
                   src={imgg || "/placeholder.svg"}
                   alt={`${blog.author} avatar`}
                   className="w-12 h-12 rounded-full object-cover"
+                  width={48}
+                  height={48}
                 />
                 <div>
                   <p className="text-sm font-medium text-gray-800">{blog.author}</p>
@@ -118,7 +153,11 @@ return (
               </div>
               <p className="text-sm text-gray-600 mb-2">{blog.content}</p>
               <p className="text-xs text-gray-400">{blog.date}</p>
-              <Button variant="destructive" className="mt-4">
+              <Button 
+                variant="destructive" 
+                className="mt-4"
+                onClick={() => handleDeleteClick(blog.id)}
+              >
                 Delete Blog
               </Button>
             </div>
@@ -155,6 +194,27 @@ return (
           />
         </Pagination>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the blog post.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
