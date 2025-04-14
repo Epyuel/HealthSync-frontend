@@ -73,10 +73,6 @@ const PatientProfile = () => {
 
   return (
     <div className="container mx-auto p-4 md:p-6">
-      <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Patient Profile</h1>
-        <p className="text-gray-500">Manage your personal information and medical details</p>
-      </div>
 
       <form onSubmit={handleSubmit}>
         <div className="space-y-6">
