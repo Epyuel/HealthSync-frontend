@@ -34,7 +34,6 @@ const ContentManagement = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [blogToDelete, setBlogToDelete] = useState<string | null>(null)
 
-  // Fetch blogs from backend
   const { data: blogsData, isLoading, isError, refetch } = useGetBlogsQuery({})
   const [deleteBlogPost] = useDeleteBlogPostMutation()
 
@@ -49,7 +48,7 @@ const ContentManagement = () => {
     try {
       await deleteBlogPost(blogToDelete).unwrap()
       toast.success("Blog deleted successfully")
-      refetch() // Refresh the list after deletion
+      refetch() 
     } catch (error) {
       toast.error("Failed to delete blog")
       console.error("Delete error:", error)
@@ -86,7 +85,7 @@ const ContentManagement = () => {
   const transformedBlogs = blogsData?.data?.blogs?.map(blog => ({
     id: blog._id,
     author: blog.author,
-    role: "Orthopedic Specialist", // You might want to fetch this from the user data
+    role: "Orthopedic Specialist",
     date: new Date(blog.publishedAt).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
