@@ -42,7 +42,6 @@ const PatientSignupForm = ({ setParentTab, onSignupSuccess }: { setParentTab: an
   const [registerPatient, {isLoading, isError, error}] = useRegisterPatientMutation();
 
   const onFinish = async (value: PatientSignupPayload) => {
-    console.log("Form Values", formValues);
     try {
       await registerPatient(formValues).unwrap();
       message.success("Registration successful!");
