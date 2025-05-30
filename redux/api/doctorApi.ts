@@ -26,7 +26,7 @@ export const doctorApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Doctor"],
+  tagTypes: ["Doctor","updateVisit"],
   endpoints: (builder) => ({
     // to login a doctor
     loginDoctor: builder.mutation<any, DoctorLoginPayload>({
@@ -95,6 +95,7 @@ export const doctorApi = createApi({
       query: ({ id, approval }) => ({
         url: `/visits?doctor_id=${id}&approval=${approval}`,
         method: "GET",
+        providesTags: ["updateVisit"]
       }),
     }),
 
@@ -123,6 +124,7 @@ export const doctorApi = createApi({
         url: `/visits/${visitPayload.visitID}`,
         method: "PATCH",
         body: visitPayload.body,
+        invalidatesTags: ["updateVisit"]
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
@@ -279,6 +281,28 @@ export const fetchDoctor = async (_id: string) => {
 
     const result = await store.dispatch(
       doctorApi.endpoints.getDoctorById.initiate(_id)
+    );
+
+    if ("error" in result) {
+      console.error("Error fetching doctors:", result.error);
+      return null;
+    }
+
+    return result.data; // Returns the fetched doctors
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return null;
+  }
+};
+
+export const fetchVerifiedDoctors = async () => {
+  try {
+    // Importing store dynamically since there is circular dependency between doctorApi.ts and store.tsx
+    const storeModule = await import("../store");
+    const store = storeModule.default;
+
+    const result = await store.dispatch(
+      doctorApi.endpoints.getVerifiedDoctors.initiate()
     );
 
     if ("error" in result) {

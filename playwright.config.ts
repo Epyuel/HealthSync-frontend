@@ -1,5 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
-
+import path from 'path';
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -11,6 +11,7 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+const authFile = path.resolve('playwright/.auth/user.json');
 export default defineConfig({
   testDir: './tests',
   /* Run tests in files in parallel */
@@ -35,18 +36,18 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
     },
-
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      name: 'with-auth',
+      testMatch: /^(?!.*(login|sign-up)\.spec\.ts$).*\.spec\.ts$/,
+      use: { ...devices['Desktop Chrome'], storageState: authFile, },
     },
-
     {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      name: 'with-out-auth',
+      testMatch: /.*\/(login|sign-up)\.spec\.ts$/,
+      use: { ...devices['Desktop Chrome']},
     },
 
     /* Test against mobile viewports. */

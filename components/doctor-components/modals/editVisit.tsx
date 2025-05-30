@@ -6,7 +6,7 @@ import { Box, useMediaQuery } from "@mui/material";
 import { Button, DatePicker, Divider, Form, Input, message, Popover, Row, Spin, Steps, Upload, UploadProps } from "antd";
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { handleDaysCalculation, VisitCard } from "@/appPages/doctor/ActiveVisits";
-import {CloseOutlined, ExperimentOutlined, LoadingOutlined, MedicineBoxOutlined, MinusCircleOutlined, UploadOutlined} from '@ant-design/icons';
+import { ExperimentOutlined, LoadingOutlined, MedicineBoxOutlined, MinusCircleOutlined, UploadOutlined} from '@ant-design/icons';
 import { batchUpload } from "@/utils/batchFileUpload";
 import { useEffect, useState } from "react";
 import { cloudinaryPresents } from "@/data/constants";
@@ -88,9 +88,9 @@ export const EditVisitModal = ({open,visit,selectedPatient,setOpen,setScheduledV
             
             try {
                 const {role,_id,...patient} = selectedPatient;
-                const mcs = medicalConditions.map((mc:any)=>mc.condition);
+                const mcs = medicalConditions?.map((mc:any)=>mc.condition)??[];
 
-                if(JSON.stringify(selectedPatient.medicalConditions)!=JSON.stringify(mcs)){
+                if(JSON.stringify(selectedPatient.medicalConditions)!=JSON.stringify(mcs) && mcs.length){
                     await updatePatient({...patient, medicalConditions:mcs}).unwrap();
                 }
                 await updateVisit({visitID: visit._id,body: visitData}).unwrap();
@@ -102,17 +102,18 @@ export const EditVisitModal = ({open,visit,selectedPatient,setOpen,setScheduledV
                     days: handleDaysCalculation(visitData.startDate)
                 }
                 // updating the current state.
-                setScheduledVisits((prev:VisitCard[])=>{
-                    const oldVisitIndex = prev.findIndex((v:VisitCard)=>v._id==visit._id);
-
-                    prev[oldVisitIndex] = formattedVisit
-                    return prev;
+                setScheduledVisits((prev: VisitCard[]) => {
+                    return [...prev.map((v) =>
+                        v._id === visit._id ? formattedVisit : v
+                    )];
                 });
 
-                setPatientsData((prev:PatientModel[])=>{
-                    const oldPatientIndex = prev.findIndex((p:PatientModel)=>p._id==selectedPatient._id);
-                    prev[oldPatientIndex] = {...selectedPatient, medicalConditions:mcs}
-                    return prev;
+                setPatientsData((prev: PatientModel[]) => {
+                    return [...prev.map((p) =>
+                        p._id === selectedPatient._id
+                            ? { ...selectedPatient, medicalConditions: mcs }
+                            : p
+                    )];
                 });
 
                 message.success("Visit edited");
@@ -451,6 +452,7 @@ export const EditVisitModal = ({open,visit,selectedPatient,setOpen,setScheduledV
 
     useEffect(()=>{
         if(visit && open){
+            form.resetFields();
             form.setFieldValue('preferredDate', dayjs(visit.preferredDate).format('MMMM DD, YYYY hh:mm A'))
             form.setFieldValue('startDate', typeof visit.startDate == 'string'? dayjs(visit.startDate):visit.startDate)
             form.setFieldValue('endDate', typeof visit.endDate == 'string'? dayjs(visit.endDate):visit.endDate)
