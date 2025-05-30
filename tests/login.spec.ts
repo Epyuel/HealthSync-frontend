@@ -44,6 +44,7 @@ test('successful-patient-login', async ({ page }) => {
 
   await expect(page.locator('body')).toContainText('Login successful.');
   await page.goto('http://localhost:3000/patient/dashboard');
+  
 })
 
 test('successful-admin-login', async ({ page }) => {

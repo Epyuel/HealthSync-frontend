@@ -87,13 +87,14 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
                 : isLoading ?
                   <Row align='middle' justify='center'>
-                    <Spin indicator={<LoadingOutlined spin />} />
+                    <Spin data-testid={'loading-spinner'} indicator={<LoadingOutlined spin />} />
                   </Row>
 
               :filteredResults.length > 0 ? (
-                <ul>
+                <ul data-testid='doc-search-result-list'>
                   {filteredResults.map((doctor, index) => (
                     <li
+                      data-testid={`${doctor._id}`}
                       key={index}
                       className="p-2 hover:bg-gray-100 rounded cursor-pointer border-b-2"
                       onClick={()=>{
@@ -106,7 +107,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
                           {doctor.firstname.at(0)??'U'}
                         </div>
                         <Row className='flex-col'>
-                          <span className='font-semibold'>Dr. {doctor.firstname} {doctor?.lastname?.at(0)?.toUpperCase()}.</span>
+                          <span data-testid='doc-search-result-name' className='font-semibold'>Dr. {doctor.firstname} {doctor?.lastname?.at(0)?.toUpperCase()}.</span>
                           <span className='text-[13px] text-gray-500'>{doctor.email}</span>
                         </Row>
                       </Row>
@@ -120,7 +121,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
                 </ul>
               ) 
 
-                    : <Row><p className="text-sm text-gray-500">No data</p></Row>
+                    : <Row><p data-testid='no-data' className="text-sm text-gray-500">No data</p></Row>
             }
 
           </div>

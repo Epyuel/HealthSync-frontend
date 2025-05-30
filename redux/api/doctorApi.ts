@@ -293,6 +293,28 @@ export const fetchDoctor = async (_id: string) => {
   }
 };
 
+export const fetchVerifiedDoctors = async () => {
+  try {
+    // Importing store dynamically since there is circular dependency between doctorApi.ts and store.tsx
+    const storeModule = await import("../store");
+    const store = storeModule.default;
+
+    const result = await store.dispatch(
+      doctorApi.endpoints.getVerifiedDoctors.initiate()
+    );
+
+    if ("error" in result) {
+      console.error("Error fetching doctors:", result.error);
+      return null;
+    }
+
+    return result.data; // Returns the fetched doctors
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return null;
+  }
+};
+
 export const loginDoctor = async (
   password: string,
   phone?: string,
