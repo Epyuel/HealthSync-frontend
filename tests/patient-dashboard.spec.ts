@@ -1,70 +1,86 @@
 import { test, expect } from '@playwright/test';
 
-test('Patient Dashboard loads upcoming appointments and prescriptions', async ({ page }) => {
-  await page.goto('http://localhost:3000/');
-  await page.getByRole('button', { name: 'Get Started' }).click();
-  await page.getByText("I'm patient").click();
-  await page.getByRole('textbox', { name: '* Phone' }).fill('251962212818');
-  await page.getByRole('textbox', { name: '* Password' }).fill('12345678@Mm');
-  await page.getByRole('button', { name: 'Login' }).click();
+test.beforeEach(async ({ page }) => {
+  // Ensure the user is logged in as a patient before each test
+  await page.goto('http://localhost:3000/patient/dashboard');
+});
+  
+test('Patient Dashboard page loads', async ({ page }) => {
+  
+  await expect(page).toHaveURL(/\/patient\/dashboard/);
+});
 
-  const blogsResponse = await page.waitForResponse((res) =>
-   res.url().includes('/blogs') && res.request().method() === 'GET'
- );
+test('Fetch upcoming approved scheduled visits', async ({ page }) => {
+  
 
- const upcomingAppointmentsResponse = await page.waitForResponse((res) =>
-   res.url().includes('/visits') &&
-   res.url().includes('status=Scheduled') &&
-   res.url().includes('approval=Approved') &&
-   res.request().method() === 'GET'
- );
+  const response = await page.waitForResponse((res) =>
+    res.url().includes('/visits') &&
+    res.url().includes('status=Scheduled') &&
+    res.url().includes('approval=Approved') &&
+    res.request().method() === 'GET'
+  );
 
-  const doctorsResponse = await page.waitForResponse((res) =>
-   res.url().includes('/doctors') &&
-   res.request().method() === 'GET'
- );
+  const json = await response.json();
+  const visits = json.data?.visits || [];
 
-
-  const doctorsJson = await doctorsResponse.json();
-  const doctors = doctorsJson.data?.doctors || [];
-
-  // ✅ Check each doctor has a name and specializations
-  for (const doctor of doctors) {
-    const firstName = `${doctor.firstname}`;
-    await expect(page.locator('body')).toContainText(firstName);
-
-    for (const spec of doctor.specializations) {
-      await expect(page.locator('body')).toContainText(spec);
-    }
-
+  for (const visit of visits) {
+    expect(visit.doctor, `Missing doctor in visit ${visit.id || 'unknown ID'}`).toBeTruthy();
   }
+});
 
-  const blogsJson = await blogsResponse.json();
-  const blogs = blogsJson.data?.blogs || [];
+test('Blogs render with title, author, and content snippet', async ({ page }) => {
+  
 
-  // ✅ Check each blog has a title, author, and content snippet
+  const response = await page.waitForResponse((res) =>
+    res.url().includes('/blogs') && res.request().method() === 'GET'
+  );
+
+  const blogs = (await response.json()).data?.blogs || [];
+
   for (const blog of blogs) {
     await expect(page.locator('body')).toContainText(blog.title);
     await expect(page.locator('body')).toContainText(`${blog.author.firstname} ${blog.author.lastname}`);
     await expect(page.locator('body')).toContainText(blog.content.slice(0, 20));
   }
+});
 
-  const json = await upcomingAppointmentsResponse.json();
-  const visits = json.data?.visits || [];
+test('Doctors list renders with name and specialization', async ({ page }) => {
+  
 
-  // ✅ Check each visit has a doctor
-  for (const visit of visits) {
-    expect(visit.doctor, `Missing doctorId in visit ${visit.id || 'unknown ID'}`).toBeTruthy();
+  const response = await page.waitForResponse((res) =>
+    res.url().includes('/doctors') && res.request().method() === 'GET'
+  );
+
+  const doctors = (await response.json()).data?.doctors || [];
+
+  for (const doctor of doctors) {
+    await expect(page.locator('body')).toContainText(doctor.firstname);
+    for (const spec of doctor.specializations) {
+      await expect(page.locator('body')).toContainText(spec);
+    }
   }
+});
 
-  // ✅ Check prescriptions
+test('Prescriptions render with medication and duration', async ({ page }) => {
+  
+
+  const response = await page.waitForResponse((res) =>
+    res.url().includes('/visits') &&
+    res.url().includes('status=Scheduled') &&
+    res.url().includes('approval=Approved') &&
+    res.request().method() === 'GET'
+  );
+
+  const visits = (await response.json()).data?.visits || [];
+
   for (const visit of visits) {
     for (const p of visit.prescription || []) {
       await expect(page.locator('body')).toContainText(`${p.medication}(${p.dosage})`);
+
       if (p.instructions.includes('Duration:')) {
-        const summaryLine = p.instructions.split('\n').find((line: string | string[]) => line.includes('Duration:'));
-        if (summaryLine) {
-          await expect(page.locator('body')).toContainText(summaryLine.trim());
+        const durationLine = p.instructions.split('\n').find((line: string | string[]) => line.includes('Duration:'));
+        if (durationLine) {
+          await expect(page.locator('body')).toContainText(durationLine.trim());
         }
       }
     }
