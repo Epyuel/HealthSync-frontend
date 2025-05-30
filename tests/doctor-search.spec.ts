@@ -51,3 +51,16 @@ test('filtering-results', async ({ page,context, request }) => {
         await expect(page.locator('body')).toContainText('Full Name');
     }
 })
+
+test('request-visit',async ({page})=>{
+    const doctor_id = '67eb15297db753f356e1173e'
+    await page.goto(`http://localhost:3000/patient/search?key=${doctor_id}`);
+
+    await page.getByRole('button', { name: 'Request Visit' }).click();
+    await page.getByRole('textbox', { name: '* Preferred Date :' }).click();
+    await page.getByText('30', { exact: true }).click();
+    await page.getByRole('textbox', { name: '* Symptom :' }).click();
+    await page.getByRole('textbox', { name: '* Symptom :' }).fill('Headache, vomit and nausea');
+    await page.getByRole('button', { name: 'Submit' }).click();
+    await expect(page.locator('body')).toContainText('Visit requested');
+})
