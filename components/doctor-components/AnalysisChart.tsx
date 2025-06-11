@@ -12,6 +12,7 @@ const DoctorVisitDashboard = () => {
   const doctor_id = user?._id || ""
 
   const { data: apiData, isLoading, error } = useGetDoctorVisitPerformanceQuery({ doctor_id })
+  console.log("API Data:", apiData)
 
   if (isLoading) {
     return (

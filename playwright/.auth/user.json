@@ -1,0 +1,25 @@
+{
+  "cookies": [
+    {
+      "name": "token",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2N2RkMjhiY2NjY2M5ZThiNTg4MWQ5ZDMiLCJmaXJzdG5hbWUiOiJtZWxha2VzZWxhbW1tIiwibGFzdG5hbWUiOiJ5aXRiYXJlayIsImVtYWlsIjoibWVsYWtlc2VsYW15aXRiYXJlazIwMTJAZ21haWwuY29tIiwiYWdlIjoyOCwiaGVpZ2h0IjoxODAsIndlaWdodCI6NjUsIm5hdGlvbmFsaXR5IjoiRXRoaW9waWEiLCJibG9vZCI6IkIrIiwiZ2VuZGVyIjoibWFsZSIsInBob25lTnVtYmVyIjoiMjUxOTYyMjEyODE4IiwibWVkaWNhbENvbmRpdGlvbnMiOlsiQW54aWV0eSAo4Yyt4YqV4YmA4Ym1KSIsIlN0cm9rZSJdLCJwYXN0VHJlYXRtZW50cyI6WyJTdXJnZXJ5ICjhiYDhi7Yg4YiF4Yqt4Yid4YqTKSJdLCJtYWpvckFjY2lkZW50cyI6WyJTcG9ydHMgSW5qdXJ5ICjhi6jhiLXhjZbhiK3hibUg4YyJ4Yuz4Ym1KSJdLCJhbGxlcmdpZXMiOlsiUGVhbnV0cyAo4Yqm4Ym-4YiO4YqSKSJdLCJyb2xlIjoicGF0aWVudCIsIl9fdiI6MCwiYmFubmVkIjp7InN0YXR1cyI6ZmFsc2UsInJlYXNvbiI6Im9rIiwiX2lkIjoiNjgxYTM4YjkyNDU3MjUyYWM3YmVkZWRhIn0sInVwZGF0ZWRBdCI6IjIwMjUtMDUtMTNUMTk6MjA6MzcuNjA0WiIsImlzVmVyaWZpZWQiOnRydWUsImJvb2ttYXJrcyI6W10sImlhdCI6MTc0ODYzNDkwNX0.De1ptpCm3sQ8n9VAjBk1UPv92BsChzaohyL_z12BJxE",
+      "domain": "healthsync-backend-bfrv.onrender.com",
+      "path": "/",
+      "expires": 1749239705.221036,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "role",
+          "value": "patients"
+        }
+      ]
+    }
+  ]
+}

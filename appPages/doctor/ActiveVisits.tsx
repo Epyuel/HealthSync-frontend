@@ -22,6 +22,7 @@ import { LoadingOutlined } from "@ant-design/icons"
 import { FaDropbox } from "react-icons/fa";
 import { Typography } from "@mui/material"
 import { PatientModel } from "@/components/models/patient"
+import {useRouter} from "next/navigation"
 
 export interface VisitCard extends VisitModel {
   name: string
@@ -44,6 +45,7 @@ export const handleDaysCalculation = (date:Date)=>{
 }
 
 const ActiveVisits: React.FC = () => {
+  const router = useRouter();
   const {user}:{user?: DoctorModel} = useSessionUser();
   const [scheduledVisits,setScheduledVisits] = useState<VisitCard[]>([]);
   const [completedVisits,setCompletedVisits] = useState<VisitCard[]>([]);
@@ -228,7 +230,7 @@ const ActiveVisits: React.FC = () => {
                     key={visit._id}
                     className="embla__slide min-w-0 sm:min-w-[350px] flex-grow-0 flex-shrink-0 basis-[85%] sm:basis-[320px] pr-4"
                   >
-                    <Card onClick={()=>{setOpenViewVisit(true); setSelectedCard(visit);}} className="h-full overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer">
+                    <Card data-testid='scheduled-visit-card' onClick={()=>{setOpenViewVisit(true); setSelectedCard(visit);}} className="h-full overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer">
                       <div className={`h-1.5 w-full ${getUrgencyColor(visit.days)}`} />
                       <CardContent className="p-5">
                         <div className="flex items-center justify-between mb-4">
@@ -379,7 +381,7 @@ const ActiveVisits: React.FC = () => {
                   </div>
                 </CardContent>
                 <CardFooter className="px-5 py-4 bg-slate-50 flex justify-center">
-                  <Button variant="outline" className="w-full border-slate-200 text-slate-700 bg-secondaryColor">
+                  <Button onClick={() => router.push("medicalhistory") } variant="outline" className="w-full border-slate-200 text-slate-700 bg-secondaryColor">
                     <ClipboardList className="h-4 w-4 mr-1.5" />
                     View History
                   </Button>

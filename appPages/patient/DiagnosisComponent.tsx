@@ -32,7 +32,7 @@ const DiagnosisComponent: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
+      <div className="flex justify-center items-center h-64">f
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     )
@@ -127,12 +127,12 @@ const DiagnosisComponent: React.FC = () => {
 
       <Tabs defaultValue="overview" className="w-full mb-8">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="prescription">Prescription</TabsTrigger>
-          <TabsTrigger value="labResults">Lab Results</TabsTrigger>
+          <TabsTrigger data-testid="overview-tabs" value="overview">Overview</TabsTrigger>
+          <TabsTrigger data-testid="prescription-tabs" value="prescription">Prescription</TabsTrigger>
+          <TabsTrigger data-testid="labResults-tabs" value="labResults">Lab Results</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="mt-4">
+        <TabsContent data-testid="overview-tabs-content" value="overview" className="mt-4">
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Visit Details</CardTitle>
@@ -169,7 +169,7 @@ const DiagnosisComponent: React.FC = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="prescription" className="mt-4">
+        <TabsContent data-testid="prescription-tabs-content" value="prescription" className="mt-4">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -192,13 +192,13 @@ const DiagnosisComponent: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-6">No prescription information available</p>
+                <p className="text-gray-500 text-center py-6">No information available</p>
               )}
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="labResults" className="mt-4">
+        <TabsContent data-testid="labResults-tabs-content" value="labResults" className="mt-4">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">

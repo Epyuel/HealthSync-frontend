@@ -21,8 +21,6 @@ import { useGetVisitsByPatientIdQuery } from "@/redux/api/patientApi"
 import type { VisitModel } from "@/components/models/visitModel"
 import { ViewVisit } from "@/components/doctor-components/modals/viewVisit"
 import type { VisitCard } from "../doctor/ActiveVisits"
-import { useGetDoctorByIdQuery } from "@/redux/api/doctorApi"
-import {useGetPatientByIdQuery} from "@/redux/api/patientApi"
 import dayjs from "dayjs"
 
 const ITEMS_PER_PAGE = 7
@@ -96,8 +94,8 @@ const PatientMedicalHistory = () => {
     } else {
       const filtered = completedVisits.filter(
         (entry) =>
-          entry.diagnosis.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          entry.doctor.toLowerCase().includes(searchTerm.toLowerCase()),
+          entry.diagnosis?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          entry.doctor?.toLowerCase().includes(searchTerm.toLowerCase()),
       )
       setFilteredData(filtered)
     }
