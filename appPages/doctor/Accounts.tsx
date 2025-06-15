@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Form, FormItem, FormLabel, FormControl, FormMessage, FormDescription, FormField } from "@/components/ui/form"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -18,8 +18,9 @@ import {useUpdateDoctorMutation} from "@/redux/api/doctorApi"
 import { useSessionUser } from "@/components/context/Session"
 import { DoctorResponse } from "@/types/doctor"
 import CloudinaryUploader from "@/components/doctor-components/CloudinaryUploader"
-import { message } from "antd"
+import { message, Select } from "antd"
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { specializations } from "@/data/DoctorData"
 
 const profileSchema = z.object({
   firstname: z.string().min(1, "First Name is required"),
@@ -27,7 +28,7 @@ const profileSchema = z.object({
   phoneNumber: z.string().min(10, "Enter a valid phone number"),
   gender: z.string().min(1, "Gender is required"),
   age: z.number().min(0, "Age must be a positive number").max(120, "Age must be realistic"),
-  specializations: z.string().optional(), 
+  specializations: z.array(z.string()), 
   email: z.string().email("Invalid email address").optional(), 
 })
 
@@ -56,7 +57,7 @@ const Accounts = () => {
       phoneNumber: "",
       gender: "",
       age: 0,
-      specializations: "",
+      specializations: [],
       email: "",
     },
   });
@@ -71,7 +72,7 @@ const Accounts = () => {
         phoneNumber: doctor.phoneNumber || "",
         gender: doctor.gender || "male",
         age: doctor.age || 0,
-        specializations: doctor.specializations?.join(", ") || "",
+        specializations: doctor.specializations,
         email: doctor.email || "",
       });
       setPreExistingDocuments(doctor.licenses || []);
@@ -97,7 +98,7 @@ const Accounts = () => {
     const { email, phoneNumber, ...rest } = data; // Exclude email and phoneNumber from the data
     const updatedData = {
       ...rest,
-      specializations: rest.specializations?.split(",").map((s) => s.trim()).filter((s) => s) || [],
+      specializations: rest.specializations,
       licenses: newlyUploadedDocuments, // Include only newly uploaded licenses
     };
     console.log("Submitting profile data:", updatedData);
@@ -285,15 +286,26 @@ const Accounts = () => {
                   name="specializations"
                   render={({ field }) => (
                     <FormItem className="md:col-span-2">
-                      <FormLabel>Specializations</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="e.g., Cardiology, Neurology" />
-                      </FormControl>
-                      <FormDescription>Enter your medical specializations, separated by commas.</FormDescription>
+                      <FormLabel className="mb-1 block">Specializations</FormLabel>
+                      <Select
+                        className="w-1/2 pr-2"
+                        mode="multiple"
+                        showSearch
+                        value={field.value}
+                        onChange={field.onChange}
+                        options={specializations.map((value) => ({
+                          label: value,
+                          value,
+                        }))}
+                      />
+                      <FormDescription>
+                        choose your medical specializations.
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
               </div>
 
               <div className="space-y-6">
