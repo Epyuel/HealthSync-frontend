@@ -2,7 +2,7 @@
 
 ![HealthSync Preview](.github/preview.png)
 
-**HealthSync** is a full-featured web application designed to transform healthcare delivery in Ethiopia by connecting patients and providers through digital innovation. It addresses key healthcare challenges such as fragmented health records, poor medication adherence, and limited diagnostic support by providing an integrated platform with intelligent tools.
+**HealthSync** is a full-featured web application designed to transform healthcare delivery by connecting patients and providers through digital innovation. It addresses key healthcare challenges such as fragmented health records, poor medication adherence, and limited diagnostic support by providing an integrated platform with intelligent tools.
 
 At its core, HealthSync enables patients to take control of their health through centralized record management, medication reminders, and symptom tracking. On the other side, healthcare providers gain timely access to patient data, alerts about non-adherence, and AI-powered insights that assist in diagnosis and treatment planning. The platform also serves as an educational hub, helping medical professionals stay informed with trusted resources and updated practices.
 
