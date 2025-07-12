@@ -342,7 +342,7 @@ export const loginDoctor = async (
 export const doctorApi2 = createApi({
   reducerPath: "doctorApi2",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.MODEL??"https://6ba2-102-218-50-243.ngrok-free.app/",
+    baseUrl: process.env.NEXT_PUBLIC_MODEL??"https://6ba2-102-218-50-243.ngrok-free.app/",
     prepareHeaders: (headers) => {
       headers.set("Content-Type", `application/json`);
       return headers;
