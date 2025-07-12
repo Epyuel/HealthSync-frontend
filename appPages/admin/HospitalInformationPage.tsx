@@ -29,6 +29,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from "@/components/ui/pagination"
 
 // Define the form schema with validation
 const formSchema = z.object({
@@ -72,7 +73,13 @@ export default function HospitalInformationPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
-  const { data, isLoading, error, refetch } = useGetAllHospitalsQuery()
+  const itemsPerPage = 7
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const { data, isLoading, error, refetch } = useGetAllHospitalsQuery({
+    page: currentPage,
+    limit: itemsPerPage,
+  })
   const { data: hospitalData, isLoading: isLoadingHospital } = useGetHospitalByIdQuery(hospitalToEdit || "", {
     skip: !hospitalToEdit || !isEditDialogOpen,
   })
@@ -81,6 +88,12 @@ export default function HospitalInformationPage() {
 
   const hospitals = data?.data?.hospitals || []
   const totalCount = data?.data?.totalCount || 0
+  const totalPages = Math.ceil(totalCount / itemsPerPage)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    refetch() // Fetch data for the new page
+  }
 
   // Initialize the form
   const form = useForm<FormValues>({
@@ -370,6 +383,34 @@ export default function HospitalInformationPage() {
               </Card>
             ))}
           </div>
+
+          {/* Pagination */}
+          <Pagination className="mt-6">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+                  className="cursor-pointer"
+                />
+              </PaginationItem>
+              {Array.from({ length: totalPages }, (_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    isActive={currentPage === index + 1}
+                    onClick={() => handlePageChange(index + 1)}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+                  className="cursor-pointer"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </>
       )}
 

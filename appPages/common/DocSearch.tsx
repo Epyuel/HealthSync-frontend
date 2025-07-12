@@ -79,10 +79,8 @@ export default function DoctorProfile({ doctorID }: DoctorProfileProps) {
             <div className="flex flex-col items-center gap-6 md:flex-row md:justify-between">
               <div className="flex flex-col items-center gap-4 md:flex-row">
                 <Avatar className="h-24 w-24 border-4 border-white">
-                  <AvatarImage src="/images/doctor.png" alt={`Dr. ${doctor.firstname} ${doctor.lastname}`} />
-                  <AvatarFallback className="text-xl">
-                    {doctor.firstname?.[0]}
-                    {doctor.lastname?.[0]}
+                  <AvatarFallback className="text-xl font-bold bg-teal-500 text-white">
+                    {doctor.firstname} {doctor.lastname}
                   </AvatarFallback>
                 </Avatar>
                 <div className="text-center md:text-left">

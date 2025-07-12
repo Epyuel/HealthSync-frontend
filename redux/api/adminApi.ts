@@ -4,7 +4,7 @@ import { AdminLoginPayload } from "@/types/admin";
 export const adminApi = createApi({
   reducerPath: "adminApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://healthsync-backend-bfrv.onrender.com/api",
+    baseUrl: "https://healthsync.weytech.et/api/api",
     credentials: "include",
     prepareHeaders: (headers) => {
       headers.set("Content-Type", `application/json`);

@@ -7,7 +7,7 @@ import {
 export const notificationsApi = createApi({
   reducerPath: "notificationsApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://healthsync-backend-bfrv.onrender.com/api",
+    baseUrl: "https://healthsync.weytech.et/api/api",
     credentials: "include",
     prepareHeaders: (headers) => {
       headers.set("Content-Type", `application/json`);

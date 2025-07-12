@@ -5,7 +5,7 @@ import { Form, Input, Select, Row, Button, message, InputNumber, Col, Divider, M
 import { qualifications, specializations } from "@/data/DoctorData"
 import type { DoctorSignupPayload } from "@/types/doctor"
 import { useRegisterDoctorMutation } from "@/redux/api/doctorApi"
-import { useGetAllHospitalsQuery, usePostHospitalMutation } from "@/redux/api/hospitalApi"
+import { useGetAllHospitalsSearchQuery, usePostHospitalMutation } from "@/redux/api/hospitalApi"
 import CloudinaryUploader from "./CloudinaryUploader"
 
 const formItemLayout = {
@@ -39,7 +39,7 @@ const DoctorSignupForm = ({ setParentTab, onSignupSuccess }: { setParentTab: any
     [],
   )
 
-  const { data: hospitals, isLoading: isLoadingHospitals } = useGetAllHospitalsQuery()
+  const { data: hospitals, isLoading: isLoadingHospitals } = useGetAllHospitalsSearchQuery()
   const [postHospital, { isLoading: isAddingHospital }] = usePostHospitalMutation()
 
   const [registerDoctor, { isLoading }] = useRegisterDoctorMutation()

@@ -4,23 +4,31 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const hospitalApi = createApi({
   reducerPath: "hospitalApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://healthsync-backend-bfrv.onrender.com/api",
+    baseUrl: "https://healthsync.weytech.et/api/api",
     credentials: "include",
     prepareHeaders: (headers) => {
       headers.set("Content-Type", `application/json`);
       return headers;
     },
   }),
-  tagTypes: ["Hospital"], 
+  tagTypes: ["Hospital"],
   endpoints: (builder) => ({
-    
-    // Get all hospitals
-    getAllHospitals: builder.query<any, void>({
+    // Get all hospitals with pagination
+    getAllHospitals: builder.query<any, { page: number; limit: number }>({
+      query: ({ page, limit }) => ({
+        url: `/hospitals`,
+        method: "GET",
+        params: { page, limit },
+      }),
+      providesTags: ["Hospital"],
+    }),
+
+    getAllHospitalsSearch: builder.query<any, void>({
       query: () => ({
-        url: "/hospitals",
+        url: `/hospitals`,
         method: "GET",
       }),
-      providesTags: ["Hospital"], 
+      providesTags: ["Hospital"],
     }),
 
     // Get hospital by ID
@@ -29,7 +37,7 @@ export const hospitalApi = createApi({
         url: `/hospitals/${id}`,
         method: "GET",
       }),
-      providesTags: ["Hospital"], 
+      providesTags: ["Hospital"],
     }),
 
     // Post a hospital
@@ -39,17 +47,20 @@ export const hospitalApi = createApi({
         method: "POST",
         body: hospital,
       }),
-      invalidatesTags: ["Hospital"], 
+      invalidatesTags: ["Hospital"],
     }),
 
     // Update a hospital
-    updateHospital: builder.mutation<any, { id: string; hospital: hospitalPostPayload }>({
+    updateHospital: builder.mutation<
+      any,
+      { id: string; hospital: hospitalPostPayload }
+    >({
       query: ({ id, hospital }) => ({
         url: `/hospitals/${id}`,
         method: "PATCH",
         body: hospital,
       }),
-      invalidatesTags: ["Hospital"], 
+      invalidatesTags: ["Hospital"],
     }),
 
     // Delete a hospital
@@ -58,7 +69,7 @@ export const hospitalApi = createApi({
         url: `/hospitals/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Hospital"], 
+      invalidatesTags: ["Hospital"],
     }),
   }),
 });
@@ -69,4 +80,5 @@ export const {
   usePostHospitalMutation,
   useUpdateHospitalMutation,
   useDeleteHospitalMutation,
+  useGetAllHospitalsSearchQuery,
 } = hospitalApi;

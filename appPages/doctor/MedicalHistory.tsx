@@ -167,7 +167,7 @@ const MedicalHistory = () => {
   }
 
   return (
-    <Card className="shadow-md border-0">
+    <Card className="shadow-md border-0 mr-4">
       <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 border-b pb-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center gap-2">

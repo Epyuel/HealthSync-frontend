@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const commonApi = createApi({
   reducerPath: "commonApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://healthsync-backend-bfrv.onrender.com/api",
+    baseUrl: "https://healthsync.weytech.et/api/api",
     credentials: "include",
     prepareHeaders: (headers) => {
       headers.set("Content-Type", `application/json`);

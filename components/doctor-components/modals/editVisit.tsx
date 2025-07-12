@@ -440,7 +440,12 @@ export const EditVisitModal = ({open,visit,selectedPatient,setOpen}:props)=>{
             form.setFieldValue('diagnosis', visit.diagnosis);
             form.setFieldValue('prescription', visit.prescription?.map(({_id,...pres}:any)=>pres));
             form.setFieldValue('labResults', visit.labResults?.map(({_id,...res}:any)=>res));
-            form.setFieldValue('medicalConditions', selectedPatient?.medicalConditions?.map(({_id,...res}:any)=>res));
+            form.setFieldValue(
+                'medicalConditions',
+                selectedPatient?.medicalConditions?.map((condition: string) => ({ condition }))
+            );
+
+            console.log('selectedPatient###############', selectedPatient?.medicalConditions)
         }
     },[form, visit, open, selectedPatient?.medicalConditions]);
 

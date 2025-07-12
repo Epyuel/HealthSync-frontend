@@ -135,7 +135,7 @@ const Login = ({ setTab }: LoginProb) => {
         </Row>
         <Form.Item
           layout="vertical"
-          label="Phone"
+          label="Phone or Email"
           name="phone"
           rules={[
             { required: true, message: "Phone number or Email is required" },

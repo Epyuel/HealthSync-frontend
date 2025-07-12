@@ -165,10 +165,10 @@ const Appointment = () => {
           <div className="flex items-center gap-4">
             <Avatar className="w-20 h-20 ring-4 ring-white shadow-lg">
               <AvatarImage
-                src={imgg.src || "/placeholder.svg"}
+                src={"/placeholder.svg"}
                 alt={doctor?.firstname ? `Dr. ${doctor.firstname}` : "Doctor"}
               />
-              <AvatarFallback className="bg-blue-500 text-white text-lg font-semibold">
+              <AvatarFallback className="bg-gradient-to-r from-blue-300 to-indigo-300 text-white text-lg font-semibold">
                 {doctor?.firstname && doctor?.lastname
                   ? `${doctor.firstname[0]}${doctor.lastname[0]}`.toUpperCase()
                   : "DR"}
