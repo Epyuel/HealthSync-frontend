@@ -3,31 +3,31 @@ import { DoctorLoginPayload, DoctorSignupPayload } from "@/types/doctor";
 import { DoctorApiResponse, DoctorsListApiResponse } from "@/types/doctor";
 import { VisitsResponse } from "@/types/visit";
 import { notificationsApi } from "./notificationsApi";
-import {patientApi} from "./patientApi";
+import { patientApi } from "./patientApi";
 
 interface InteractionPayload {
-  medicines:string[],
-  medical_conditions:string[],
-  type:'dd_interaction'|'md_interaction',
-  text?:string
+  medicines: string[];
+  medical_conditions: string[];
+  type: "dd_interaction" | "md_interaction";
+  text?: string;
 }
 
-interface Chat{
-  text:string,
-  type:'chat'
+interface Chat {
+  text: string;
+  type: "chat";
 }
 
 export const doctorApi = createApi({
   reducerPath: "doctorApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://healthsync.weytech.et/api/api",
+    baseUrl: "https://healthsync-backend-bfrv.onrender.com/api",
     credentials: "include",
     prepareHeaders: (headers) => {
       headers.set("Content-Type", `application/json`);
       return headers;
     },
   }),
-  tagTypes: ["Doctor","Visit","AppointedPatient"],
+  tagTypes: ["Doctor", "Visit", "AppointedPatient"],
   endpoints: (builder) => ({
     // to login a doctor
     loginDoctor: builder.mutation<any, DoctorLoginPayload>({
@@ -97,7 +97,7 @@ export const doctorApi = createApi({
         url: `/visits?doctor_id=${id}&approval=${approval}&limit=50`,
         method: "GET",
       }),
-      providesTags: ["Visit"]
+      providesTags: ["Visit"],
     }),
 
     getVisitsByDoctorId: builder.query<any, { id: string }>({
@@ -118,8 +118,6 @@ export const doctorApi = createApi({
       }),
     }),
 
-
-
     updateVisit: builder.mutation<void, { visitID: string; body: any }>({
       query: (visitPayload) => ({
         url: `/visits/${visitPayload.visitID}`,
@@ -135,10 +133,8 @@ export const doctorApi = createApi({
           // Handle error if needed
         }
       },
-      invalidatesTags:['Visit']
+      invalidatesTags: ["Visit"],
     }),
-
-    
 
     getDoctorCompletedVisits: builder.query<VisitsResponse, string>({
       query: (doctor_id: string) => ({
@@ -153,14 +149,17 @@ export const doctorApi = createApi({
         url: `/doctors/${id}/patients`,
         method: "GET",
       }),
-      providesTags:["AppointedPatient"]
+      providesTags: ["AppointedPatient"],
     }),
 
-    updatePatientMedicalCondition: builder.mutation<any, {patientId:string,medicalConditions:string[]}>({
-      query: ({patientId,medicalConditions}) => ({
+    updatePatientMedicalCondition: builder.mutation<
+      any,
+      { patientId: string; medicalConditions: string[] }
+    >({
+      query: ({ patientId, medicalConditions }) => ({
         url: `/patients/${patientId}/medical-condition`,
         method: "PATCH",
-        body:{medicalConditions},
+        body: { medicalConditions },
       }),
       invalidatesTags: ["AppointedPatient"],
     }),
@@ -256,12 +255,18 @@ export const doctorApi = createApi({
           notificationsApi.util.invalidateTags(["NotificationTag"])
         );
 
-        return { data: { ...(typeof ratingResponse.data === "object" && ratingResponse.data !== null ? ratingResponse.data : {}), notificationUpdated: true } };
+        return {
+          data: {
+            ...(typeof ratingResponse.data === "object" &&
+            ratingResponse.data !== null
+              ? ratingResponse.data
+              : {}),
+            notificationUpdated: true,
+          },
+        };
       },
-      invalidatesTags: ["Doctor"], 
+      invalidatesTags: ["Doctor"],
     }),
-
-
   }),
 });
 
@@ -338,11 +343,12 @@ export const loginDoctor = async (
   }
 };
 
-
 export const doctorApi2 = createApi({
   reducerPath: "doctorApi2",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_MODEL??"https://6ba2-102-218-50-243.ngrok-free.app/",
+    baseUrl:
+      process.env.NEXT_PUBLIC_MODEL ??
+      "https://6ba2-102-218-50-243.ngrok-free.app/",
     prepareHeaders: (headers) => {
       headers.set("Content-Type", `application/json`);
       return headers;
@@ -370,7 +376,4 @@ export const doctorApi2 = createApi({
   }),
 });
 
-export const {
-  useDrugInteractionMutation,
-  useChatMutation
-} = doctorApi2;
+export const { useDrugInteractionMutation, useChatMutation } = doctorApi2;

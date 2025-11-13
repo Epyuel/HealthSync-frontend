@@ -12,7 +12,7 @@ import { PatientResponse } from "@/types/patient";
 export const patientApi = createApi({
   reducerPath: "patientApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://healthsync.weytech.et/api/api",
+    baseUrl: "https://healthsync-backend-bfrv.onrender.com/api",
     credentials: "include",
     prepareHeaders: (headers) => {
       headers.set("Content-Type", `application/json`);
@@ -118,7 +118,6 @@ export const patientApi = createApi({
       providesTags: ["Visits"],
     }),
 
-
     getUpcomingActiveAppointments: builder.query<VisitModel[], string>({
       query: (patient_id) => ({
         url: `/visits?patient_id=${patient_id}&approval=Scheduled&status=Scheduled`,
@@ -127,7 +126,6 @@ export const patientApi = createApi({
       transformResponse: (response: VisitsResponse) => response.data.visits,
       providesTags: ["Visits"],
     }),
-
 
     getCurrentPatient: builder.query<PatientResponse, void>({
       query: () => "/patients/me",
@@ -148,16 +146,15 @@ export const patientApi = createApi({
       invalidatesTags: ["Patient"],
     }),
 
-
     getPrescriptionsByPatientId: builder.query<any, string>({
       query: (patient_id) => ({
         url: `/patients/${patient_id}/me/prescriptions?limit=1000`,
         method: "GET",
       }),
-      transformResponse: (response: PrescriptionResponse) => response.data.prescriptions,
+      transformResponse: (response: PrescriptionResponse) =>
+        response.data.prescriptions,
       providesTags: ["Visits"],
     }),
-
   }),
 });
 

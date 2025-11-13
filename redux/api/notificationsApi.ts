@@ -7,16 +7,15 @@ import {
 export const notificationsApi = createApi({
   reducerPath: "notificationsApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://healthsync.weytech.et/api/api",
+    baseUrl: "https://healthsync-backend-bfrv.onrender.com/api",
     credentials: "include",
     prepareHeaders: (headers) => {
       headers.set("Content-Type", `application/json`);
       return headers;
     },
   }),
-  tagTypes: ["NotificationTag"], 
+  tagTypes: ["NotificationTag"],
   endpoints: (builder) => ({
-
     // Get all notifications with isRead filter
     getAllPatientNotifications: builder.query<
       PatientNotificationsResponse,
@@ -27,10 +26,8 @@ export const notificationsApi = createApi({
         method: "GET",
         params: isRead !== undefined ? { isRead } : undefined,
       }),
-      providesTags: ["NotificationTag"], 
+      providesTags: ["NotificationTag"],
     }),
-
-
 
     // Get notification by ID
     getNotificationById: builder.query<PatientNotification, string>({
@@ -38,10 +35,8 @@ export const notificationsApi = createApi({
         url: `/notifications/${id}`,
         method: "GET",
       }),
-      providesTags: ["NotificationTag"], 
+      providesTags: ["NotificationTag"],
     }),
-
-
 
     // Mark notification as read/unread
     updateNotificationStatus: builder.mutation<
@@ -53,10 +48,8 @@ export const notificationsApi = createApi({
         method: "PATCH",
         body: { isRead },
       }),
-      invalidatesTags: ["NotificationTag"], 
+      invalidatesTags: ["NotificationTag"],
     }),
-
-    
   }),
 });
 

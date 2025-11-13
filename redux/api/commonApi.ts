@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const commonApi = createApi({
   reducerPath: "commonApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://healthsync.weytech.et/api/api",
+    baseUrl: "https://healthsync-backend-bfrv.onrender.com/api",
     credentials: "include",
     prepareHeaders: (headers) => {
       headers.set("Content-Type", `application/json`);
@@ -12,7 +12,6 @@ export const commonApi = createApi({
   }),
   tagTypes: [],
   endpoints: (builder) => ({
-
     // Logout the current user
     logout: builder.mutation({
       query: () => ({
@@ -22,14 +21,18 @@ export const commonApi = createApi({
     }),
 
     me: builder.query({
-      query: (role:'patients'|'doctors'|'admin') => ({
+      query: (role: "patients" | "doctors" | "admin") => ({
         url: `/${role}/me`,
         method: "GET",
       }),
     }),
 
     verifyOtp: builder.mutation({
-      query: (body: { email: string; otp: string; role: "doctor" | "patient" }) => ({
+      query: (body: {
+        email: string;
+        otp: string;
+        role: "doctor" | "patient";
+      }) => ({
         url: "/otp/verify",
         method: "POST",
         body,
@@ -52,9 +55,9 @@ export const {
   useResendOtpMutation,
 } = commonApi;
 
-export const fetchMe = async (role:'patients'|'doctors'|'admin') => {
+export const fetchMe = async (role: "patients" | "doctors" | "admin") => {
   try {
-    // Importing store dynamically since there is circular dependency between doctorApi.ts and store.tsx 
+    // Importing store dynamically since there is circular dependency between doctorApi.ts and store.tsx
     const storeModule = await import("../store");
     const store = storeModule.default;
 
